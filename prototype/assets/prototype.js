@@ -526,7 +526,7 @@ function renderLogin() {
             ${loginField("密码", "••••••", true)}
             <label class="block">
               <span class="mb-2 block text-sm text-slate">角色</span>
-              <select class="w-full rounded-[1.4rem] border border-line bg-white/70 px-4 py-3 outline-none transition focus:border-ocean">
+              <select class="surface-input">
                 <option>思政教师</option>
                 <option>审核员</option>
                 <option>学校管理员</option>
@@ -565,7 +565,7 @@ function renderShell() {
           <nav class="mt-5 space-y-1.5">
             ${NAV_ITEMS.map((item) => navItem(item)).join("")}
           </nav>
-          <div class="mt-6 rounded-[1.75rem] border border-line bg-white/60 p-4">
+          <div class="surface-block surface-block-quiet mt-6 p-4">
             <p class="text-xs uppercase tracking-[0.28em] text-slate">当前身份</p>
             <p class="mt-2 text-lg font-semibold text-ink">${state.user.name}</p>
             <p class="mt-1 text-sm text-slate">${state.user.role}</p>
@@ -643,11 +643,11 @@ function renderDashboard() {
               </div>
               <h3 class="font-display mt-4 text-3xl text-ink">欢迎回来，${state.user.name}</h3>
               <p class="mt-3 max-w-2xl text-sm leading-8 text-slate">
-                平台围绕“主题创建、模板套用、内容生成、全链路审核、发布审计、资产沉淀”形成交付闭环，
-                当前共有 ${state.tasks.length} 个任务在系统流转，其中 ${pendingTasks} 个仍需处理。
-              </p>
-            </div>
-            <div class="rounded-[1.6rem] border border-line bg-white/60 px-5 py-4">
+              平台围绕“主题创建、模板套用、内容生成、全链路审核、发布审计、资产沉淀”形成交付闭环，
+              当前共有 ${state.tasks.length} 个任务在系统流转，其中 ${pendingTasks} 个仍需处理。
+            </p>
+          </div>
+            <div class="surface-block surface-block-quiet px-5 py-4">
               <div class="text-xs uppercase tracking-[0.24em] text-slate">一期里程碑</div>
               <div class="mt-2 text-lg font-semibold text-ink">Web 端最小可用闭环已具备演示形态</div>
             </div>
@@ -732,7 +732,7 @@ function renderWorkspace() {
         </div>
         <label class="mt-4 block">
           <span class="mb-2 block text-sm text-slate">教学目标</span>
-          <textarea data-field="goal" class="h-32 w-full rounded-[1.5rem] border border-line bg-white/70 px-4 py-3 text-sm leading-7 outline-none transition focus:border-ocean">${state.workspaceForm.goal}</textarea>
+          <textarea data-field="goal" class="surface-input h-32 text-sm leading-7">${state.workspaceForm.goal}</textarea>
         </label>
         <div class="mt-6 flex flex-wrap gap-3">
           <button data-action="save-draft" class="rounded-full border border-line px-5 py-3 text-sm font-semibold text-ink transition hover:bg-white">保存草稿</button>
@@ -796,7 +796,7 @@ function renderChat() {
             <button data-action="chat-confirm-generate" class="rounded-full bg-ocean px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#243642]">确认对话并生成任务</button>
           </div>
         </div>
-        <div class="mt-6 rounded-[1.8rem] border border-line bg-white/55 p-5">
+        <div class="surface-block mt-6 p-5">
           <div class="space-y-4">
             ${state.conversation.messages.map((message) => chatBubble(message)).join("")}
           </div>
@@ -834,7 +834,7 @@ function renderChat() {
             ${miniInfo("结尾方式", state.conversation.summary.ending)}
             ${miniInfo("整体语气", state.conversation.summary.style)}
           </div>
-          <div class="mt-5 rounded-[1.5rem] border border-line bg-white/55 p-5">
+          <div class="surface-block mt-5 p-5">
             <div class="text-sm font-semibold text-ink">必须保留的画面 / 内容点</div>
             <div class="mt-3 flex flex-wrap gap-2">
               ${state.conversation.summary.mustInclude.map((item) => `<span class="tag-chip active">${item}</span>`).join("")}
@@ -851,7 +851,7 @@ function renderChat() {
             ${stepRow("分镜设计", "围绕校园案例与行动倡议构建镜头节奏。", "active")}
             ${stepRow("字幕与配音", "按五年级理解水平收敛表达强度。", "todo")}
           </div>
-          <div class="mt-5 rounded-[1.5rem] border border-line bg-white/55 p-5 text-sm leading-7 text-slate">
+          <div class="surface-block mt-5 p-5 text-sm leading-7 text-slate">
             这一步的意义在于让教师和 AI 先对齐“要讲什么、怎么讲、讲给谁听”，避免直接生成导致脚本方向偏差。
           </div>
         </div>
@@ -932,14 +932,14 @@ function renderTasks() {
         <div class="grid gap-4 xl:grid-cols-[1fr_0.9fr]">
           <div class="panel panel-strong rounded-[2rem] p-6">
             <h4 class="font-display text-2xl">脚本与分镜</h4>
-            <div class="mt-4 rounded-[1.5rem] border border-line bg-white/55 p-5 text-sm leading-8 text-slate">
+            <div class="surface-block mt-4 p-5 text-sm leading-8 text-slate">
               ${activeTask.script}
             </div>
             <div class="mt-5 space-y-3">
               ${activeTask.storyboard
                 .map(
                   (item, index) => `
-                    <div class="rounded-[1.4rem] border border-line bg-white/55 p-4">
+                    <div class="surface-block px-4 py-4">
                       <div class="text-sm font-semibold text-ink">镜头 ${index + 1}</div>
                       <div class="mt-2 text-sm leading-7 text-slate">${item}</div>
                     </div>
@@ -950,12 +950,10 @@ function renderTasks() {
           </div>
           <div class="panel panel-strong rounded-[2rem] p-6">
             <h4 class="font-display text-2xl">结果预览</h4>
-            <div class="mini-chart mt-5 rounded-[1.8rem] p-5">
-              <div class="rounded-[1.5rem] bg-[#cfd8dc] p-5">
-                <div class="aspect-[4/3] rounded-[1.3rem] bg-gradient-to-br from-[#5f7078] via-[#7f9198] to-[#ccd6da]"></div>
-              </div>
+            <div class="mini-chart mt-5 p-4">
+              <div class="aspect-[4/3] rounded-[1.3rem] bg-gradient-to-br from-[#5f7078] via-[#7f9198] to-[#ccd6da]"></div>
             </div>
-            <div class="mt-5 rounded-[1.5rem] border border-line bg-white/55 p-5">
+            <div class="surface-block mt-5 p-5">
               <div class="text-sm font-semibold text-ink">风控摘要</div>
               <div class="mt-2 text-sm leading-7 text-slate">${activeTask.riskSummary}</div>
             </div>
@@ -1005,10 +1003,10 @@ function renderReview() {
               <div class="mt-5 space-y-3">
                 ${active.tags.map((tag) => `<span class="tag-chip active">${tag}</span>`).join("")}
               </div>
-              <div class="mt-5 rounded-[1.5rem] border border-line bg-white/55 p-5 text-sm leading-8 text-slate">
+              <div class="surface-block mt-5 p-5 text-sm leading-8 text-slate">
                 ${active.machine}
               </div>
-              <div class="mt-5 rounded-[1.5rem] border border-line bg-white/55 p-5 text-sm leading-8 text-slate">
+              <div class="surface-block mt-5 p-5 text-sm leading-8 text-slate">
                 ${active.notes}
               </div>
             </div>
@@ -1050,21 +1048,21 @@ function renderReviewDrawer(active) {
           ${miniInfo("审核链路", "输入前审校 -> 机审 -> 人工复核")}
           ${miniInfo("建议结论", "修改后可发布")}
         </div>
-        <div class="mt-6 rounded-[1.6rem] border border-line bg-white/60 p-5">
+        <div class="surface-block surface-block-quiet mt-6 p-5">
           <div class="text-sm font-semibold text-ink">审核模块切换</div>
           <div class="mt-4 flex flex-wrap gap-2">
             ${["text", "image", "video", "audio"]
               .map((tab) => filterChip("audit-tab", tab, state.ui.reviewAuditTab, auditTabLabel(tab)))
               .join("")}
           </div>
-          <div class="mt-5 rounded-[1.4rem] border border-line bg-white/65 p-5">
+          <div class="surface-block mt-5 p-5">
             <div class="text-lg font-semibold text-ink">${module.title}</div>
             <div class="mt-2 text-sm leading-7 text-slate">${module.summary}</div>
             <div class="mt-4 space-y-3">
               ${module.points
                 .map(
                   (point) => `
-                    <div class="rounded-[1.2rem] border border-line bg-white/55 px-4 py-3 text-sm leading-7 text-slate">
+                    <div class="surface-block px-4 py-3 text-sm leading-7 text-slate">
                       ${point}
                     </div>
                   `
@@ -1074,13 +1072,13 @@ function renderReviewDrawer(active) {
           </div>
         </div>
         <div class="mt-6 grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-          <div class="rounded-[1.6rem] border border-line bg-white/60 p-5">
+          <div class="surface-block surface-block-quiet p-5">
             <div class="text-sm font-semibold text-ink">关键帧联动查看</div>
             <div class="mt-4 space-y-3">
               ${active.keyframes
                 .map(
                   (frame) => `
-                    <div class="rounded-[1.3rem] border border-line bg-white/55 p-4">
+                    <div class="surface-block p-4">
                       <div class="flex items-center justify-between gap-3">
                         <span class="text-sm font-semibold text-ink">${frame.label}</span>
                         <span class="text-xs uppercase tracking-[0.2em] text-slate">${frame.time}</span>
@@ -1093,13 +1091,13 @@ function renderReviewDrawer(active) {
                 .join("")}
             </div>
           </div>
-          <div class="rounded-[1.6rem] border border-line bg-white/60 p-5">
+          <div class="surface-block surface-block-quiet p-5">
             <div class="text-sm font-semibold text-ink">字幕片段与复核建议</div>
             <div class="mt-4 space-y-3">
               ${active.subtitleSegments
                 .map(
                   (segment) => `
-                    <div class="rounded-[1.3rem] border border-line ${segment.level === "warn" ? "bg-[#ecdfd9]" : "bg-white/55"} p-4">
+                    <div class="${segment.level === "warn" ? "rounded-[1.3rem] border border-line bg-[#ecdfd9]" : "surface-block"} p-4">
                       <div class="flex items-center justify-between gap-3">
                         <span class="text-xs uppercase tracking-[0.2em] text-slate">${segment.time}</span>
                         <span class="status-pill ${segment.level === "warn" ? "status-review" : "status-approved"}">
@@ -1116,9 +1114,9 @@ function renderReviewDrawer(active) {
             </div>
           </div>
         </div>
-        <div class="mt-6 rounded-[1.6rem] border border-line bg-white/60 p-5">
+        <div class="surface-block surface-block-quiet mt-6 p-5">
           <div class="text-sm font-semibold text-ink">人工复核意见</div>
-          <textarea id="review-note" class="mt-4 h-32 w-full rounded-[1.4rem] border border-line bg-white/70 px-4 py-3 text-sm leading-7 outline-none transition focus:border-ocean">${active.notes}</textarea>
+          <textarea id="review-note" class="surface-input mt-4 h-32 text-sm leading-7">${active.notes}</textarea>
           <div class="mt-5 flex flex-wrap gap-3">
             <button data-action="review-approve" class="rounded-full bg-ocean px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#243642]">审核通过并进入发布</button>
             <button data-action="review-reject" class="rounded-full border border-line px-5 py-3 text-sm font-semibold text-ink transition hover:bg-white">退回修改</button>
@@ -1167,12 +1165,10 @@ function renderAssets() {
           ${miniInfo("来源", active.source)}
           ${miniInfo("授权范围", active.access)}
         </div>
-        <div class="mini-chart mt-5 rounded-[1.8rem] p-5">
-          <div class="rounded-[1.5rem] bg-[#d4dce0] p-5">
-            <div class="aspect-[16/9] rounded-[1.3rem] bg-gradient-to-br from-[#61747c] to-[#ced8dc]"></div>
-          </div>
+        <div class="mini-chart mt-5 p-4">
+          <div class="aspect-[16/9] rounded-[1.3rem] bg-gradient-to-br from-[#61747c] to-[#ced8dc]"></div>
         </div>
-        <div class="mt-5 rounded-[1.6rem] border border-line bg-white/55 p-5 text-sm leading-7 text-slate">${active.description}</div>
+        <div class="surface-block mt-5 p-5 text-sm leading-7 text-slate">${active.description}</div>
         <div class="mt-5 grid gap-3 md:grid-cols-2">
           ${miniInfo("复用次数", active.usage)}
           ${miniInfo("审核状态", "已通过机审与人工复核")}
@@ -1224,7 +1220,7 @@ function renderPublish() {
           ${miniInfo("最近操作人", active.operator)}
         </div>
         <div class="mt-5 grid gap-4 lg:grid-cols-2">
-          <div class="rounded-[1.6rem] border border-line bg-white/55 p-5">
+          <div class="surface-block p-5">
             <div class="text-sm font-semibold text-ink">审计留痕</div>
             <div class="mt-4 space-y-3 text-sm leading-7 text-slate">
               <div>09:05 审核通过，保留机审报告与人工复核意见。</div>
@@ -1232,9 +1228,9 @@ function renderPublish() {
               <div>09:20 已同步至新区资源平台，版本号自动上浮。</div>
             </div>
           </div>
-          <div class="rounded-[1.6rem] border border-line bg-white/55 p-5">
+          <div class="surface-block p-5">
             <div class="text-sm font-semibold text-ink">发布说明</div>
-            <textarea class="mt-4 h-40 w-full rounded-[1.4rem] border border-line bg-white/65 px-4 py-3 text-sm leading-7 outline-none transition focus:border-ocean">适用于思政导入课，面向区域学校共享。已完成人工复核与导出留痕。</textarea>
+            <textarea class="surface-input mt-4 h-40 text-sm leading-7">适用于思政导入课，面向区域学校共享。已完成人工复核与导出留痕。</textarea>
           </div>
         </div>
       </div>
@@ -1276,7 +1272,7 @@ function renderOrg() {
           <span>PERMISSION</span>
           <strong>权限说明</strong>
         </div>
-        <div class="mt-5 rounded-[1.6rem] border border-line bg-white/55 p-5">
+        <div class="surface-block mt-5 p-5">
           <div class="text-sm font-semibold text-ink">${member.name} · ${member.role}</div>
           <div class="mt-3 text-sm leading-7 text-slate">${member.scope}</div>
         </div>
@@ -1335,7 +1331,7 @@ function renderOps() {
             ${progressRow("重点人工复核", "16%")}
             ${progressRow("资产沉淀增长", "61%")}
           </div>
-          <div class="mt-6 rounded-[1.6rem] border border-line bg-white/55 p-5 text-sm leading-7 text-slate">
+          <div class="surface-block mt-6 p-5 text-sm leading-7 text-slate">
             一期阶段重点不是追求极复杂 BI，而是让学校与区域管理者能看见成本、审核和复用情况，具备持续交付依据。
           </div>
         </div>
@@ -1363,7 +1359,7 @@ function templateCard(item) {
       </div>
       <h4 class="font-display mt-4 text-2xl leading-tight">${item.title}</h4>
       <p class="mt-3 text-sm leading-7 text-slate">${item.description}</p>
-      <div class="mt-5 rounded-[1.4rem] border border-line bg-white/55 p-4">
+      <div class="surface-block mt-5 p-4">
         <div class="text-xs uppercase tracking-[0.22em] text-slate">默认气质</div>
         <div class="mt-2 text-sm font-semibold text-ink">${item.tone}</div>
       </div>
@@ -1437,7 +1433,7 @@ function publishCard(item) {
 
 function orgNodeCard(item, index) {
   return `
-    <button data-org-node="${item.id}" class="w-full rounded-[1.5rem] border ${item.id === state.ui.orgNode ? "border-ocean bg-white" : "border-line bg-white/55"} px-4 py-4 text-left transition hover:bg-white">
+    <button data-org-node="${item.id}" class="w-full ${item.id === state.ui.orgNode ? "rounded-[1.5rem] border border-ocean bg-white" : "surface-block surface-block-quiet"} px-4 py-4 text-left transition hover:bg-white">
       <div class="text-xs uppercase tracking-[0.2em] text-slate">0${index + 1}</div>
       <div class="mt-2 text-lg font-semibold text-ink">${item.name}</div>
       <div class="mt-2 text-sm leading-7 text-slate">${item.description}</div>
@@ -1447,7 +1443,7 @@ function orgNodeCard(item, index) {
 
 function memberCard(item) {
   return `
-    <button data-member-select="${item.id}" class="w-full rounded-[1.5rem] border ${item.id === state.ui.activeMemberId ? "border-ocean bg-white" : "border-line bg-white/55"} px-4 py-4 text-left transition hover:bg-white">
+    <button data-member-select="${item.id}" class="w-full ${item.id === state.ui.activeMemberId ? "rounded-[1.5rem] border border-ocean bg-white" : "surface-block surface-block-quiet"} px-4 py-4 text-left transition hover:bg-white">
       <div class="flex items-center justify-between gap-3">
         <div class="text-lg font-semibold text-ink">${item.name}</div>
         <span class="status-pill status-draft">${item.role}</span>
@@ -1459,7 +1455,7 @@ function memberCard(item) {
 
 function timelineItem(item) {
   return `
-    <div class="relative rounded-[1.4rem] border border-line bg-white/55 p-4">
+    <div class="surface-block relative p-4">
       <span class="absolute left-[-1.32rem] top-5 h-3 w-3 rounded-full bg-[#7a8d96]"></span>
       <div class="text-xs uppercase tracking-[0.2em] text-slate">${item.time}</div>
       <div class="mt-2 text-sm font-semibold text-ink">${item.title}</div>
@@ -1470,10 +1466,10 @@ function timelineItem(item) {
 
 function field(label, key, value, options) {
   const input = options
-    ? `<select data-field="${key}" class="w-full rounded-[1.4rem] border border-line bg-white/70 px-4 py-3 text-sm outline-none transition focus:border-ocean">
+    ? `<select data-field="${key}" class="surface-input text-sm">
         ${options.map((option) => `<option ${option === value ? "selected" : ""}>${option}</option>`).join("")}
       </select>`
-    : `<input data-field="${key}" value="${value}" class="w-full rounded-[1.4rem] border border-line bg-white/70 px-4 py-3 text-sm outline-none transition focus:border-ocean" />`;
+    : `<input data-field="${key}" value="${value}" class="surface-input text-sm" />`;
   return `
     <label class="block">
       <span class="mb-2 block text-sm text-slate">${label}</span>
@@ -1486,14 +1482,14 @@ function loginField(label, value, isPassword = false) {
   return `
     <label class="block">
       <span class="mb-2 block text-sm text-slate">${label}</span>
-      <input ${isPassword ? 'type="password"' : ""} value="${value}" class="w-full rounded-[1.4rem] border border-line bg-white/70 px-4 py-3 outline-none transition focus:border-ocean" />
+      <input ${isPassword ? 'type="password"' : ""} value="${value}" class="surface-input" />
     </label>
   `;
 }
 
 function proposalLine(label, value) {
   return `
-    <div class="rounded-[1.4rem] border border-line bg-white/55 p-4">
+    <div class="surface-block p-4">
       <div class="text-xs uppercase tracking-[0.24em] text-slate">${label}</div>
       <div class="mt-2 text-sm leading-7 text-ink">${value}</div>
     </div>
@@ -1502,7 +1498,7 @@ function proposalLine(label, value) {
 
 function metricCard(label, value) {
   return `
-    <div class="rounded-2xl border border-line bg-white/55 p-4">
+    <div class="surface-block p-4">
       <div class="text-xs uppercase tracking-[0.2em] text-slate">${label}</div>
       <div class="mt-2 text-sm font-semibold text-ink">${value}</div>
     </div>
@@ -1511,7 +1507,7 @@ function metricCard(label, value) {
 
 function todoCard(text, scope, href) {
   return `
-    <a href="${href}" class="block rounded-[1.4rem] border border-line bg-white/55 px-4 py-4 text-left transition hover:bg-white/80">
+    <a href="${href}" class="surface-block surface-block-quiet block px-4 py-4 text-left transition hover:bg-white/70">
       <div class="text-sm font-semibold text-ink">${text}</div>
       <div class="mt-2 text-xs uppercase tracking-[0.2em] text-slate">${scope}</div>
     </a>
@@ -1520,7 +1516,7 @@ function todoCard(text, scope, href) {
 
 function processStep(title, desc) {
   return `
-    <div class="rounded-[1.4rem] border border-line bg-white/65 p-4">
+    <div class="surface-block p-4">
       <div class="text-sm font-semibold text-ink">${title}</div>
       <div class="mt-2 text-xs leading-6 text-slate">${desc}</div>
     </div>
@@ -1529,7 +1525,7 @@ function processStep(title, desc) {
 
 function smallStep(no, title, desc) {
   return `
-    <div class="rounded-[1.4rem] border border-line bg-white/60 px-4 py-4">
+    <div class="surface-block surface-block-quiet px-4 py-4">
       <div class="text-xs uppercase tracking-[0.24em] text-slate">${no}</div>
       <div class="mt-2 text-sm font-semibold text-ink">${title}</div>
       <div class="mt-2 text-sm leading-7 text-slate">${desc}</div>
@@ -1539,7 +1535,7 @@ function smallStep(no, title, desc) {
 
 function statCard(label, value, hint) {
   return `
-    <div class="rounded-[1.5rem] border border-line bg-white/70 p-4">
+    <div class="surface-block p-4">
       <div class="text-sm text-slate">${label}</div>
       <div class="mt-3 text-3xl font-semibold text-ink">${value}</div>
       <div class="mt-2 text-xs leading-6 text-slate">${hint}</div>
@@ -1561,7 +1557,7 @@ function progressRow(label, value) {
 
 function stepCard(step) {
   return `
-    <div class="rounded-[1.4rem] border border-line bg-white/60 p-4">
+    <div class="surface-block surface-block-quiet p-4">
       <div class="flex items-center gap-3">
         <span class="step-dot ${step.status}"></span>
         <span class="text-sm font-semibold text-ink">${step.name}</span>
@@ -1572,7 +1568,7 @@ function stepCard(step) {
 
 function stepRow(title, desc, status) {
   return `
-    <div class="flex items-start gap-4 rounded-[1.5rem] border border-line bg-white/55 p-4">
+    <div class="surface-block surface-block-quiet flex items-start gap-4 p-4">
       <span class="step-dot ${status} mt-1 shrink-0"></span>
       <div>
         <div class="text-base font-semibold text-ink">${title}</div>
@@ -1584,7 +1580,7 @@ function stepRow(title, desc, status) {
 
 function miniInfo(label, value) {
   return `
-    <div class="rounded-[1.4rem] border border-line bg-white/65 p-4">
+    <div class="surface-block p-4">
       <div class="text-xs uppercase tracking-[0.22em] text-slate">${label}</div>
       <div class="mt-2 text-base font-semibold text-ink">${value}</div>
     </div>
@@ -1593,9 +1589,9 @@ function miniInfo(label, value) {
 
 function chartBlock(label, value) {
   return `
-    <div class="rounded-[1.5rem] border border-line bg-white/60 p-4">
+    <div class="surface-block surface-block-quiet p-4">
       <div class="text-xs uppercase tracking-[0.18em] text-slate">${label}</div>
-      <div class="mini-chart mt-4 h-32 rounded-[1.2rem] p-3">
+      <div class="mini-chart mt-4 h-32 p-3">
         <div class="h-full rounded-[1rem] bg-gradient-to-t from-[#5d727b] to-[#d5dee2]" style="clip-path: polygon(0 100%, 0 70%, 18% 62%, 36% 78%, 55% 45%, 72% 52%, 100% 22%, 100% 100%);"></div>
       </div>
       <div class="mt-3 text-lg font-semibold text-ink">${value}</div>
@@ -1605,7 +1601,7 @@ function chartBlock(label, value) {
 
 function permissionItem(label, enabled) {
   return `
-    <div class="flex items-center justify-between rounded-[1.3rem] border border-line bg-white/55 px-4 py-3">
+    <div class="surface-block surface-block-quiet flex items-center justify-between px-4 py-3">
       <span class="text-sm font-medium text-ink">${label}</span>
       <span class="status-pill ${enabled ? "status-approved" : "status-rejected"}">${enabled ? "已开启" : "未授权"}</span>
     </div>
