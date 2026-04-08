@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>中小学思政 AI 内容支持平台原型</title>
+    <script>
+      tailwind = {
+        config: {
+          theme: {
+            extend: {
+              colors: {
+                ink: "#1d2733",
+                mist: "#eef2f4",
+                line: "#d8e0e3",
+                slate: "#6d7b85",
+                panel: "#fafaf8",
+                ocean: "#30434f",
+                accent: "#8a9aa4",
+                success: "#5f7f72",
+                warn: "#a18361",
+                danger: "#8b6c65"
+              },
+              boxShadow: {
+                soft: "0 24px 60px rgba(29, 39, 51, 0.08)",
+                panel: "0 8px 30px rgba(34, 48, 58, 0.06)"
+              },
+              borderRadius: {
+                "2xl": "1.5rem"
+              }
+            }
+          }
+        }
+      };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=Noto+Serif+SC:wght@600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body class="bg-[#e9eeef] text-ink">
+    <div id="app"></div>
+    <script src="./assets/app.js"></script>
+  </body>
+  </html>
