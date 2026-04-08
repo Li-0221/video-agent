@@ -777,8 +777,27 @@ function renderWorkspace() {
 }
 
 function renderChat() {
+  const summary = state.conversation.summary;
+  const duration = state.workspaceForm.duration || "60秒微课";
+  const previewFrames = [
+    {
+      time: "00:00 - 00:12",
+      title: "课堂开场定题",
+      desc: `以“${summary.mustInclude[0]}”快速建立课堂情境，让学生先进入熟悉场景。`
+    },
+    {
+      time: "00:12 - 00:36",
+      title: "校园案例展开",
+      desc: `围绕“${summary.angle}”展开主体镜头，把抽象价值放回学生日常。`
+    },
+    {
+      time: "00:36 - 01:00",
+      title: "结尾价值收束",
+      desc: `用“${summary.ending}”收尾，并保留“${summary.mustInclude[2]}”作为课堂发问钩子。`
+    }
+  ];
   return `
-    <div class="grid gap-6 xl:grid-cols-[1.08fr_0.92fr] fade-up">
+    <div class="grid gap-6 xl:grid-cols-[1.04fr_0.96fr] fade-up">
       <div class="panel panel-strong rounded-[2rem] p-6">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -824,35 +843,78 @@ function renderChat() {
       </div>
       <div class="space-y-6">
         <div class="panel panel-strong rounded-[2rem] p-6">
-          <div class="proposal-chip">
-            <span>CONVERSATION SUMMARY</span>
-            <strong>当前确认结果</strong>
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="proposal-chip">
+                <span>VIDEO PREVIEW</span>
+                <strong>右侧实时生成预览</strong>
+              </div>
+              <h3 class="font-display mt-4 text-2xl">对话正在收敛成视频样子</h3>
+            </div>
+            <span class="status-pill status-draft">准备生成</span>
           </div>
-          <div class="mt-5 grid gap-3 md:grid-cols-2">
-            ${miniInfo("适用对象", state.conversation.summary.audience)}
-            ${miniInfo("表达角度", state.conversation.summary.angle)}
-            ${miniInfo("结尾方式", state.conversation.summary.ending)}
-            ${miniInfo("整体语气", state.conversation.summary.style)}
-          </div>
-          <div class="surface-block mt-5 p-5">
-            <div class="text-sm font-semibold text-ink">必须保留的画面 / 内容点</div>
-            <div class="mt-3 flex flex-wrap gap-2">
-              ${state.conversation.summary.mustInclude.map((item) => `<span class="tag-chip active">${item}</span>`).join("")}
+          <div class="mt-5 rounded-[1.8rem] border border-[#2d4049]/10 bg-[#22343e] p-4 text-white shadow-[0_18px_40px_rgba(25,38,45,0.18)]">
+            <div class="rounded-[1.5rem] border border-white/10 bg-[radial-gradient(circle_at_top_left,_rgba(214,227,233,0.22),_transparent_28%),linear-gradient(135deg,_#2d4752_0%,_#1f2d35_55%,_#152027_100%)] p-5">
+              <div class="flex items-center justify-between text-[11px] uppercase tracking-[0.28em] text-white/65">
+                <span>Preview Monitor</span>
+                <span>${duration}</span>
+              </div>
+              <div class="mt-5 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+                <div class="rounded-[1.4rem] border border-white/10 bg-white/5 p-5">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <div class="text-xs uppercase tracking-[0.24em] text-white/45">主画面气质</div>
+                      <div class="mt-2 font-display text-2xl text-white">${summary.angle}</div>
+                    </div>
+                    <div class="grid h-14 w-14 place-items-center rounded-full border border-white/15 bg-white/10">
+                      <div class="ml-1 h-0 w-0 border-y-[10px] border-l-[16px] border-y-transparent border-l-white/90"></div>
+                    </div>
+                  </div>
+                  <p class="mt-4 max-w-md text-sm leading-7 text-white/72">
+                    画面会优先围绕 ${summary.mustInclude[1]} 这些学生熟悉场景展开，再用 ${summary.ending} 方式完成价值收束。
+                  </p>
+                  <div class="mt-6 grid gap-3 sm:grid-cols-3">
+                    ${chatPreviewMetric("适用对象", summary.audience)}
+                    ${chatPreviewMetric("语气设定", summary.style)}
+                    ${chatPreviewMetric("建议时长", duration)}
+                  </div>
+                </div>
+                <div class="space-y-3">
+                  ${chatPreviewStrip("镜头 01", summary.mustInclude[0], "h-24 bg-[linear-gradient(135deg,_rgba(248,251,252,0.20),_rgba(166,190,201,0.10)),radial-gradient(circle_at_20%_20%,_rgba(255,255,255,0.26),_transparent_38%),linear-gradient(180deg,_#5c7884_0%,_#364e59_100%)]")}
+                  ${chatPreviewStrip("镜头 02", summary.mustInclude[1], "h-24 bg-[linear-gradient(135deg,_rgba(223,232,214,0.18),_rgba(147,171,152,0.08)),radial-gradient(circle_at_78%_24%,_rgba(255,255,255,0.22),_transparent_26%),linear-gradient(180deg,_#566c61_0%,_#2f4038_100%)]")}
+                  ${chatPreviewStrip("镜头 03", summary.mustInclude[2], "h-24 bg-[linear-gradient(135deg,_rgba(235,224,206,0.18),_rgba(181,150,111,0.08)),radial-gradient(circle_at_50%_18%,_rgba(255,255,255,0.24),_transparent_30%),linear-gradient(180deg,_#75624a_0%,_#46392a_100%)]")}
+                </div>
+              </div>
             </div>
           </div>
         </div>
         <div class="panel panel-strong rounded-[2rem] p-6">
           <div class="proposal-chip">
-            <span>AI OUTPUT</span>
-            <strong>下一步生成预期</strong>
+            <span>STORYBOARD DRAFT</span>
+            <strong>预计分镜编排</strong>
+          </div>
+          <div class="mt-5 space-y-3">
+            ${previewFrames.map((frame, index) => chatPreviewFrame(frame, index)).join("")}
+          </div>
+        </div>
+        <div class="panel panel-strong rounded-[2rem] p-6">
+          <div class="proposal-chip">
+            <span>GENERATION PIPELINE</span>
+            <strong>接下来会怎么生成</strong>
+          </div>
+          <div class="mt-5 grid gap-3 md:grid-cols-2">
+            ${miniInfo("表达角度", summary.angle)}
+            ${miniInfo("结尾方式", summary.ending)}
+            ${miniInfo("整体语气", summary.style)}
+            ${miniInfo("保留画面", `${summary.mustInclude.length} 项`)}
           </div>
           <div class="mt-5 space-y-4">
-            ${stepRow("教学脚本", "基于已确认的对话结果输出教学脚本。", "done")}
-            ${stepRow("分镜设计", "围绕校园案例与行动倡议构建镜头节奏。", "active")}
-            ${stepRow("字幕与配音", "按五年级理解水平收敛表达强度。", "todo")}
+            ${stepRow("教学脚本", "对话结果已经足够稳定，可直接生成课程脚本。", "done")}
+            ${stepRow("分镜与关键帧", "优先围绕校园案例、提问式导入和行动倡议完成镜头草案。", "active")}
+            ${stepRow("字幕、配音与合成", "按小学五年级理解水平收敛措辞与镜头节奏。", "todo")}
           </div>
           <div class="surface-block mt-5 p-5 text-sm leading-7 text-slate">
-            这一步的意义在于让教师和 AI 先对齐“要讲什么、怎么讲、讲给谁听”，避免直接生成导致脚本方向偏差。
+            左侧每补充一次语气、镜头或结尾要求，右侧这块预览都会更接近最终视频，不再只是静态摘要说明。
           </div>
         </div>
       </div>
@@ -1578,6 +1640,41 @@ function stepRow(title, desc, status) {
   `;
 }
 
+function chatPreviewMetric(label, value) {
+  return `
+    <div class="rounded-[1.2rem] border border-white/10 bg-white/6 px-4 py-3">
+      <div class="text-[11px] uppercase tracking-[0.22em] text-white/48">${label}</div>
+      <div class="mt-2 text-sm font-semibold text-white">${value}</div>
+    </div>
+  `;
+}
+
+function chatPreviewStrip(label, value, toneClass) {
+  return `
+    <div class="rounded-[1.3rem] border border-white/10 p-3 ${toneClass}">
+      <div class="text-[11px] uppercase tracking-[0.22em] text-white/58">${label}</div>
+      <div class="mt-7 text-sm font-semibold text-white">${value}</div>
+    </div>
+  `;
+}
+
+function chatPreviewFrame(frame, index) {
+  return `
+    <div class="surface-block surface-block-quiet flex items-start gap-4 p-4">
+      <div class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#dbe4e7] text-sm font-semibold text-[#314550]">
+        0${index + 1}
+      </div>
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="text-base font-semibold text-ink">${frame.title}</div>
+          <span class="text-xs uppercase tracking-[0.18em] text-slate">${frame.time}</span>
+        </div>
+        <div class="mt-2 text-sm leading-7 text-slate">${frame.desc}</div>
+      </div>
+    </div>
+  `;
+}
+
 function miniInfo(label, value) {
   return `
     <div class="surface-block p-4">
@@ -1695,7 +1792,7 @@ function appendConversationTurn(prompt) {
     id: `msg-${Date.now()}-a`,
     role: "assistant",
     kind: "analysis",
-    text: "我已根据你的补充调整创作方向。新的对话结论会同步到右侧摘要，并作为生成脚本与分镜的依据。"
+    text: "我已根据你的补充调整创作方向。新的对话结论会同步到右侧预览，并作为生成脚本与分镜的依据。"
   };
   if (lowerPrompt.includes("课堂导入")) {
     state.conversation.summary.angle = "先提问再进入案例";
