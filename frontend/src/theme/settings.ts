@@ -4,7 +4,7 @@ export const themeSettings: App.Theme.ThemeSetting = {
   grayscale: false,
   colourWeakness: false,
   recommendColor: false,
-  themeColor: '#646cff',
+  themeColor: '#165dff',
   themeRadius: 6,
   otherColor: {
     info: '#2080f0',
@@ -49,7 +49,7 @@ export const themeSettings: App.Theme.ThemeSetting = {
     autoSelectFirstMenu: false
   },
   footer: {
-    visible: true,
+    visible: false,
     fixed: false,
     height: 48,
     right: true

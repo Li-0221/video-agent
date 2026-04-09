@@ -39,5 +39,7 @@ declare namespace StorageType {
     };
     /** The last login user id */
     lastLoginUserId: string;
+    /** The active mock user key */
+    mockUserKey: string;
   }
 }

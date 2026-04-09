@@ -20,6 +20,9 @@ declare module "@elegant-router/types" {
     "403": "/403";
     "404": "/404";
     "500": "/500";
+    "governance": "/governance";
+    "governance_library": "/governance/library";
+    "governance_review": "/governance/review";
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd)?";
@@ -27,6 +30,15 @@ declare module "@elegant-router/types" {
     "manage_menu": "/manage/menu";
     "manage_user": "/manage/user";
     "manage_user-detail": "/manage/user-detail/:id";
+    "operations": "/operations";
+    "operations_ops": "/operations/ops";
+    "operations_org": "/operations/org";
+    "school": "/school";
+    "school_assets": "/school/assets";
+    "workflow": "/workflow";
+    "workflow_script-review": "/workflow/script-review";
+    "workflow_tasks": "/workflow/tasks";
+    "workflow_workspace": "/workflow/workspace";
   };
 
   /**
@@ -61,10 +73,14 @@ declare module "@elegant-router/types" {
     | "403"
     | "404"
     | "500"
+    | "governance"
     | "home"
     | "iframe-page"
     | "login"
     | "manage"
+    | "operations"
+    | "school"
+    | "workflow"
   >;
 
   /**
@@ -86,10 +102,18 @@ declare module "@elegant-router/types" {
     | "500"
     | "iframe-page"
     | "login"
+    | "governance_library"
+    | "governance_review"
     | "home"
     | "manage_menu"
     | "manage_user-detail"
     | "manage_user"
+    | "operations_ops"
+    | "operations_org"
+    | "school_assets"
+    | "workflow_script-review"
+    | "workflow_tasks"
+    | "workflow_workspace"
   >;
 
   /**

@@ -40,6 +40,41 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'governance',
+    path: '/governance',
+    component: 'layout.base',
+    meta: {
+      title: 'governance',
+      i18nKey: 'route.governance',
+      icon: 'mdi:shield-check-outline',
+      order: 3
+    },
+    children: [
+      {
+        name: 'governance_library',
+        path: '/governance/library',
+        component: 'view.governance_library',
+        meta: {
+          title: 'governance_library',
+          i18nKey: 'route.governance_library',
+          icon: 'mdi:folder-play-outline',
+          order: 2
+        }
+      },
+      {
+        name: 'governance_review',
+        path: '/governance/review',
+        component: 'view.governance_review',
+        meta: {
+          title: 'governance_review',
+          i18nKey: 'route.governance_review',
+          icon: 'mdi:file-search-outline',
+          order: 1
+        }
+      }
+    ]
+  },
+  {
     name: 'home',
     path: '/home',
     component: 'layout.base$view.home',
@@ -123,6 +158,111 @@ export const generatedRoutes: GeneratedRoute[] = [
           hideInMenu: true,
           roles: ['R_ADMIN'],
           activeMenu: 'manage_user'
+        }
+      }
+    ]
+  },
+  {
+    name: 'operations',
+    path: '/operations',
+    component: 'layout.base',
+    meta: {
+      title: 'operations',
+      i18nKey: 'route.operations',
+      icon: 'mdi:cog-outline',
+      order: 5
+    },
+    children: [
+      {
+        name: 'operations_ops',
+        path: '/operations/ops',
+        component: 'view.operations_ops',
+        meta: {
+          title: 'operations_ops',
+          i18nKey: 'route.operations_ops',
+          icon: 'mdi:chart-line',
+          order: 2
+        }
+      },
+      {
+        name: 'operations_org',
+        path: '/operations/org',
+        component: 'view.operations_org',
+        meta: {
+          title: 'operations_org',
+          i18nKey: 'route.operations_org',
+          icon: 'mdi:account-group-outline',
+          order: 1
+        }
+      }
+    ]
+  },
+  {
+    name: 'school',
+    path: '/school',
+    component: 'layout.base',
+    meta: {
+      title: 'school',
+      i18nKey: 'route.school',
+      icon: 'mdi:school-outline',
+      order: 4
+    },
+    children: [
+      {
+        name: 'school_assets',
+        path: '/school/assets',
+        component: 'view.school_assets',
+        meta: {
+          title: 'school_assets',
+          i18nKey: 'route.school_assets',
+          icon: 'mdi:image-multiple-outline',
+          order: 1
+        }
+      }
+    ]
+  },
+  {
+    name: 'workflow',
+    path: '/workflow',
+    component: 'layout.base',
+    meta: {
+      title: 'workflow',
+      i18nKey: 'route.workflow',
+      icon: 'mdi:creation-outline',
+      order: 2
+    },
+    children: [
+      {
+        name: 'workflow_script-review',
+        path: '/workflow/script-review',
+        component: 'view.workflow_script-review',
+        meta: {
+          title: 'workflow_script-review',
+          i18nKey: 'route.workflow_script-review',
+          icon: 'mdi:script-text-outline',
+          order: 2
+        }
+      },
+      {
+        name: 'workflow_tasks',
+        path: '/workflow/tasks',
+        component: 'view.workflow_tasks',
+        meta: {
+          title: 'workflow_tasks',
+          i18nKey: 'route.workflow_tasks',
+          icon: 'mdi:timeline-clock-outline',
+          order: 3
+        }
+      },
+      {
+        name: 'workflow_workspace',
+        path: '/workflow/workspace',
+        component: 'view.workflow_workspace',
+        meta: {
+          title: 'workflow_workspace',
+          i18nKey: 'route.workflow_workspace',
+          icon: 'mdi:lightbulb-on-outline',
+          order: 1
         }
       }
     ]

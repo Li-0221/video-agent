@@ -1,25 +1,54 @@
-import { request } from '../request';
+import { localStg } from '@/utils/storage';
+import { mockAuthUsers } from '@/mock/video-platform';
+
+type MockFlatResponse<T> = Promise<{
+  data: T;
+  error: null;
+}>;
+
+function resolveMock<T>(data: T): MockFlatResponse<T> {
+  return Promise.resolve({
+    data,
+    error: null
+  });
+}
+
+function getMockUserKey(userName?: string) {
+  const normalized = (userName || '').toLowerCase();
+
+  if (normalized.includes('student') || normalized.includes('学生')) {
+    return 'student';
+  }
+
+  if (normalized.includes('admin') || normalized.includes('主任') || normalized.includes('管理员')) {
+    return 'admin';
+  }
+
+  return 'teacher';
+}
 
 /**
  * Login
  *
- * @param userName User name
- * @param password Password
+ * Uses local mock data so the frontend can run independently from backend services.
  */
-export function fetchLogin(userName: string, password: string) {
-  return request<Api.Auth.LoginToken>({
-    url: '/auth/login',
-    method: 'post',
-    data: {
-      userName,
-      password
-    }
+export function fetchLogin(userName: string, _password: string) {
+  const mockUserKey = getMockUserKey(userName);
+
+  localStg.set('mockUserKey', mockUserKey);
+
+  return resolveMock<Api.Auth.LoginToken>({
+    token: `mock-token-${mockUserKey}`,
+    refreshToken: `mock-refresh-token-${mockUserKey}`
   });
 }
 
 /** Get user info */
 export function fetchGetUserInfo() {
-  return request<Api.Auth.UserInfo>({ url: '/auth/getUserInfo' });
+  const mockUserKey = localStg.get('mockUserKey') || 'teacher';
+  const user = mockAuthUsers[mockUserKey] || mockAuthUsers.teacher;
+
+  return resolveMock<Api.Auth.UserInfo>(user);
 }
 
 /**
@@ -28,21 +57,20 @@ export function fetchGetUserInfo() {
  * @param refreshToken Refresh token
  */
 export function fetchRefreshToken(refreshToken: string) {
-  return request<Api.Auth.LoginToken>({
-    url: '/auth/refreshToken',
-    method: 'post',
-    data: {
-      refreshToken
-    }
+  return resolveMock<Api.Auth.LoginToken>({
+    token: `${refreshToken}-next`,
+    refreshToken: `${refreshToken}-rotate`
   });
 }
 
 /**
  * return custom backend error
  *
- * @param code error code
- * @param msg error message
+ * kept for compatibility with existing call sites
  */
-export function fetchCustomBackendError(code: string, msg: string) {
-  return request({ url: '/auth/error', params: { code, msg } });
+export function fetchCustomBackendError(_code: string, _msg: string) {
+  return Promise.resolve({
+    data: null,
+    error: new Error('Mock mode does not simulate custom backend errors.')
+  });
 }

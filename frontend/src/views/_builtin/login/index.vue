@@ -59,7 +59,7 @@ const bgThemeColor = computed(() =>
         <div class="max-w-lg text-center">
           <h2 class="mb-4 text-42px font-bold leading-tight tracking-wide">{{ $t('system.title') }}</h2>
           <p class="text-18px text-white/90 font-light leading-relaxed">
-            A fresh and elegant admin template based on Vite 7, TypeScript and Naive UI.
+            面向中小学思政课堂的 AI 视频生产平台，覆盖发起、审稿、生成、复审和学校定制。
           </p>
         </div>
       </div>
@@ -95,7 +95,7 @@ const bgThemeColor = computed(() =>
           <!-- Welcome Text -->
           <div class="mb-10 text-left">
             <h3 class="mb-3 text-32px text-gray-900 font-bold dark:text-white">{{ $t(activeModule.label) }}</h3>
-            <p class="text-16px text-gray-500 font-medium">Welcome back! Please enter your details.</p>
+            <p class="text-16px text-gray-500 font-medium">使用本地 mock 登录后即可体验教师、学生与学校管理员流程。</p>
           </div>
 
           <!-- Transition Wrapper for Form -->
