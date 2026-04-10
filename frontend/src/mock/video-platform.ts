@@ -34,6 +34,24 @@ export interface SchoolPreset {
   desc: string;
 }
 
+export interface SchoolThemeProfile {
+  id: string;
+  schoolName: string;
+  shortName: string;
+  schoolType: '小学' | '中学';
+  officialSite: string;
+  systemName: string;
+  slogan: string;
+  watermarkText: string;
+  logoText: string;
+  theme: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    surface: string;
+  };
+}
+
 export interface GradePreset {
   id: string;
   label: string;
@@ -54,6 +72,7 @@ export interface StoryboardScene {
 
 export interface VideoTask {
   id: string;
+  schoolId: string;
   title: string;
   templateId: string;
   creatorRole: CreatorRole;
@@ -75,6 +94,7 @@ export interface VideoTask {
 
 export interface ReviewCase {
   id: string;
+  schoolId: string;
   taskId: string;
   title: string;
   severity: ReviewSeverity;
@@ -108,6 +128,7 @@ export interface ReviewCase {
 
 export interface SchoolAsset {
   id: string;
+  schoolId: string;
   type: string;
   title: string;
   source: string;
@@ -118,6 +139,7 @@ export interface SchoolAsset {
 
 export interface PublishItem {
   id: string;
+  schoolId: string;
   taskId: string;
   title: string;
   status: 'published' | 'review' | 'draft';
@@ -133,6 +155,20 @@ export interface RoleProfile {
   dailyLimit: string;
   desc: string;
   capabilities: string[];
+}
+
+export interface ReviewRule {
+  id: string;
+  name: string;
+  stage: '输入' | '脚本' | '图片' | '音频' | '视频' | '发布';
+  riskLevel: '低' | '中' | '高';
+  weight: number;
+  scope: '全局' | '学校';
+  enabled: boolean;
+  description: string;
+  hitHint: string;
+  owner: string;
+  updatedAt: string;
 }
 
 export const platformMetrics: PlatformMetric[] = [
@@ -241,6 +277,77 @@ export const schoolPresets: SchoolPreset[] = [
   }
 ];
 
+export const schoolThemeProfiles: SchoolThemeProfile[] = [
+  {
+    id: 'cdsszx',
+    schoolName: '成都石室中学',
+    shortName: '石室中学',
+    schoolType: '中学',
+    officialSite: 'https://www.cdshishi.net',
+    systemName: '成都石室中学 AI 思政视频工作台',
+    slogan: '文翁石室 德润课堂',
+    watermarkText: '文翁石室 德润课堂',
+    logoText: '石室',
+    theme: {
+      primary: '#6b5341',
+      secondary: '#323844',
+      accent: '#c52e2e',
+      surface: '#f8f6f0'
+    }
+  },
+  {
+    id: 'cdwgy',
+    schoolName: '成都外国语学校',
+    shortName: '成都外国语',
+    schoolType: '中学',
+    officialSite: 'https://www.cfls.net.cn',
+    systemName: '成都外国语学校 AI 思政视频平台',
+    slogan: '培育盛世英才的摇篮，通向五洲四海的桥梁',
+    watermarkText: '成都外国语学校 思政课堂专用',
+    logoText: '成外',
+    theme: {
+      primary: '#9c1e21',
+      secondary: '#231e1d',
+      accent: '#ec222e',
+      surface: '#fbf5f5'
+    }
+  },
+  {
+    id: 'cdsywgy',
+    schoolName: '成都市实验外国语学校',
+    shortName: '成实外',
+    schoolType: '中学',
+    officialSite: 'https://www.cefls.cn',
+    systemName: '成实外 AI 视频创作平台',
+    slogan: '厚德博学 进取卓越',
+    watermarkText: '成都市实验外国语学校 校内教学专用',
+    logoText: '实外',
+    theme: {
+      primary: '#c8102e',
+      secondary: '#515151',
+      accent: '#f3d9df',
+      surface: '#fff7f9'
+    }
+  },
+  {
+    id: 'pxtx',
+    schoolName: '成都市泡桐树小学（天府校区）',
+    shortName: '泡小天府',
+    schoolType: '小学',
+    officialSite: 'http://www.pxtf.org',
+    systemName: '泡桐树小学 AI 思政微课平台',
+    slogan: '校园成长课堂',
+    watermarkText: '泡桐树小学 校园成长课堂',
+    logoText: '泡小',
+    theme: {
+      primary: '#2e8b57',
+      secondary: '#245c43',
+      accent: '#8fbf5a',
+      surface: '#f4fbf6'
+    }
+  }
+];
+
 export const gradePresets: GradePreset[] = [
   {
     id: 'g1-2',
@@ -309,6 +416,7 @@ export const scriptReviewScenes: StoryboardScene[] = [
 export const videoTasks: VideoTask[] = [
   {
     id: 'task-101',
+    schoolId: 'cdsszx',
     title: '诚信主题 3 分钟课堂视频',
     templateId: 'tpl-moral',
     creatorRole: '教师',
@@ -332,6 +440,7 @@ export const videoTasks: VideoTask[] = [
   },
   {
     id: 'task-102',
+    schoolId: 'cdsywgy',
     title: '钱学森与科技报国',
     templateId: 'tpl-hero',
     creatorRole: '教师',
@@ -355,6 +464,7 @@ export const videoTasks: VideoTask[] = [
   },
   {
     id: 'task-103',
+    schoolId: 'pxtx',
     title: '学生作业：校园文明一分钟短片',
     templateId: 'tpl-student',
     creatorRole: '学生',
@@ -378,6 +488,7 @@ export const videoTasks: VideoTask[] = [
   },
   {
     id: 'task-104',
+    schoolId: 'pxtx',
     title: '学生违规指令待重提',
     templateId: 'tpl-student',
     creatorRole: '学生',
@@ -404,6 +515,7 @@ export const videoTasks: VideoTask[] = [
 export const reviewCases: ReviewCase[] = [
   {
     id: 'rv-1',
+    schoolId: 'cdsywgy',
     taskId: 'task-102',
     title: '钱学森与科技报国',
     severity: '中',
@@ -456,6 +568,7 @@ export const reviewCases: ReviewCase[] = [
   },
   {
     id: 'rv-2',
+    schoolId: 'pxtx',
     taskId: 'task-104',
     title: '学生违规指令待重提',
     severity: '高',
@@ -502,6 +615,7 @@ export const reviewCases: ReviewCase[] = [
 export const schoolAssets: SchoolAsset[] = [
   {
     id: 'asset-1',
+    schoolId: 'pxtx',
     type: '校园背景图',
     title: '实验小学操场全景',
     source: '学校管理员上传',
@@ -511,6 +625,7 @@ export const schoolAssets: SchoolAsset[] = [
   },
   {
     id: 'asset-2',
+    schoolId: 'cdsszx',
     type: '校徽与校训',
     title: '固定叠加校徽 + 校训',
     source: '学校管理员上传',
@@ -520,11 +635,32 @@ export const schoolAssets: SchoolAsset[] = [
   },
   {
     id: 'asset-3',
+    schoolId: 'cdsszx',
     type: '知识点标签',
     title: '本校红色资源标签包',
     source: '教师自定义',
     usage: '已复用 7 次',
     description: '包含“嘉兴红船”“井冈山精神”等本校可见标签，可注入脚本提示词。',
+    access: '本校隔离可用'
+  },
+  {
+    id: 'asset-4',
+    schoolId: 'cdwgy',
+    type: '系统主题配置',
+    title: '成都外国语品牌主题包',
+    source: '学校管理员上传',
+    usage: '已复用 12 次',
+    description: '包含系统名称、主色、校内水印文案和首页欢迎语，用于学校切换演示。',
+    access: '本校隔离可用'
+  },
+  {
+    id: 'asset-5',
+    schoolId: 'cdsywgy',
+    type: '校训视觉资源',
+    title: '厚德博学 进取卓越',
+    source: '官网公开信息整理',
+    usage: '已复用 9 次',
+    description: '用于学校品牌主题展示和片尾校训叠加，可与学校标识一并配置。',
     access: '本校隔离可用'
   }
 ];
@@ -532,6 +668,7 @@ export const schoolAssets: SchoolAsset[] = [
 export const publishItems: PublishItem[] = [
   {
     id: 'pub-1',
+    schoolId: 'pxtx',
     taskId: 'task-103',
     title: '学生作业：校园文明一分钟短片',
     status: 'published',
@@ -542,6 +679,7 @@ export const publishItems: PublishItem[] = [
   },
   {
     id: 'pub-2',
+    schoolId: 'cdsywgy',
     taskId: 'task-102',
     title: '钱学森与科技报国',
     status: 'review',
@@ -552,6 +690,7 @@ export const publishItems: PublishItem[] = [
   },
   {
     id: 'pub-3',
+    schoolId: 'cdsszx',
     taskId: 'task-101',
     title: '诚信主题 3 分钟课堂视频',
     status: 'draft',
@@ -625,26 +764,105 @@ export const acceptanceChecklist = [
   'TC06 学校管理员上传校徽并启用固定叠加后，所有新视频片头片尾自动带校徽。',
   'TC07 选择小学 1-2 年级时，应自动切换慢语速、简单词汇和卡通风格。',
   'TC08 同一学生当日第 3 次发起时，系统应提示达到上限并拒绝生成。',
-  'TC09 高峰期 200 并发时，系统不崩溃并展示用户当前排队位置与预计等待时间。'
+  'TC09 高峰期 200 并发时，系统不崩溃并展示用户当前排队位置与预计等待时间。',
+  'TC10 不同角色登录后，只能看到对应菜单、按钮和看板卡片。',
+  'TC11 切换不同学校时，系统名称、主题色、学校标识和学校资产同步切换。',
+  'TC12 调整审核规则权重后，新的命中说明和处理结果即时生效。'
+];
+
+export const reviewRules: ReviewRule[] = [
+  {
+    id: 'rule-001',
+    name: '政治敏感表达拦截',
+    stage: '输入',
+    riskLevel: '高',
+    weight: 100,
+    scope: '全局',
+    enabled: true,
+    description: '对明显不适宜未成年人教育场景的敏感政治表达直接拦截，不进入脚本生成阶段。',
+    hitHint: '命中后直接提示“内容违规，请修改后重试”。',
+    owner: '平台运营',
+    updatedAt: '今天 10:12'
+  },
+  {
+    id: 'rule-002',
+    name: '历史人物形象强制复审',
+    stage: '视频',
+    riskLevel: '中',
+    weight: 80,
+    scope: '全局',
+    enabled: true,
+    description: '涉及雷锋、周恩来、钱学森等真实历史人物时，即使机审通过，也必须进入教师完整看片复审。',
+    hitHint: '命中后在复审页高亮关键帧和字幕片段。',
+    owner: '平台运营',
+    updatedAt: '今天 09:46'
+  },
+  {
+    id: 'rule-003',
+    name: '校徽 / 校训缺失提醒',
+    stage: '发布',
+    riskLevel: '低',
+    weight: 20,
+    scope: '学校',
+    enabled: true,
+    description: '学校开启品牌叠加策略后，如片头片尾缺失校徽或校训，发布前给出补全提醒。',
+    hitHint: '命中后允许继续保存草稿，但不能直接发布。',
+    owner: '学校管理员',
+    updatedAt: '今天 08:58'
+  },
+  {
+    id: 'rule-004',
+    name: '低龄词汇难度提醒',
+    stage: '脚本',
+    riskLevel: '低',
+    weight: 15,
+    scope: '学校',
+    enabled: true,
+    description: '当小学低年级脚本中出现过多抽象词汇时，提示教师优化语言难度，但不强制拦截。',
+    hitHint: '命中后在脚本审核台展示“适龄表达”提醒。',
+    owner: '学校管理员',
+    updatedAt: '今天 11:06'
+  }
 ];
 
 export const mockAuthUsers: Record<string, Api.Auth.UserInfo> = {
   teacher: {
     userId: 'teacher-001',
     userName: '李老师',
+    schoolId: 'cdsszx',
+    schoolName: '成都石室中学',
     roles: ['R_TEACHER'],
-    buttons: ['video:create', 'script:review', 'video:publish']
+    buttons: [
+      'video:create',
+      'script:review',
+      'video:publish',
+      'review:approve',
+      'scene:voice-regenerate',
+      'scene:visual-regenerate'
+    ]
   },
   student: {
     userId: 'student-001',
     userName: '张同学',
+    schoolId: 'pxtx',
+    schoolName: '成都市泡桐树小学（天府校区）',
     roles: ['R_STUDENT'],
-    buttons: ['video:create']
+    buttons: ['video:create', 'task:resubmit']
   },
   admin: {
     userId: 'admin-001',
     userName: '周主任',
+    schoolId: 'cdwgy',
+    schoolName: '成都外国语学校',
     roles: ['R_SCHOOL_ADMIN'],
-    buttons: ['asset:manage', 'watermark:config', 'record:view']
+    buttons: ['asset:manage', 'watermark:config', 'record:view', 'school:theme-config', 'rules:school-view']
+  },
+  ops: {
+    userId: 'ops-001',
+    userName: '平台运营 何老师',
+    schoolId: 'cdsywgy',
+    schoolName: '成都市实验外国语学校',
+    roles: ['R_PLATFORM_OPS'],
+    buttons: ['review:approve', 'rules:manage', 'threshold:manage', 'record:view']
   }
 };

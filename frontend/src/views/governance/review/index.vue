@@ -1,13 +1,24 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useSchoolStore } from '@/store/modules/school';
+import { useDemoAccess } from '@/hooks/business/demo-access';
 import { reviewCases } from '@/mock/video-platform';
 
-const activeReviewId = ref(reviewCases[0].id);
+const schoolStore = useSchoolStore();
+const { hasButton, isPlatformOps } = useDemoAccess();
+
+const visibleReviewCases = computed(() =>
+  isPlatformOps.value ? reviewCases : reviewCases.filter(item => item.schoolId === schoolStore.activeSchool.id)
+);
+
+const activeReviewId = ref(visibleReviewCases.value[0]?.id || '');
 const activeModuleKey = ref<'text' | 'image' | 'video' | 'audio'>('video');
 
-const activeReview = computed(() => reviewCases.find(item => item.id === activeReviewId.value) || reviewCases[0]);
+const activeReview = computed(
+  () => visibleReviewCases.value.find(item => item.id === activeReviewId.value) || visibleReviewCases.value[0]
+);
 const activeModule = computed(
-  () => activeReview.value.modules.find(item => item.key === activeModuleKey.value) || activeReview.value.modules[0]
+  () => activeReview.value?.modules.find(item => item.key === activeModuleKey.value) || activeReview.value?.modules?.[0]
 );
 
 function getSeverityType(level: string): NaiveUI.ThemeColor {
@@ -34,13 +45,20 @@ function notify(action: string) {
         <div>
           <h2 class="text-28px text-[#111827] font-700">输出安全复审</h2>
           <p class="mt-8px text-14px text-[#475569] leading-24px">
+            {{
+              isPlatformOps
+                ? '平台运营可跨校巡检高风险案例。'
+                : `当前仅展示 ${schoolStore.activeSchool.shortName} 的复审案例。`
+            }}
             集中处理输入拦截、0.6~0.9 置信度复审、0.9 自动拦截，以及历史人物全量教师复核等关键安全规则。
           </p>
         </div>
         <div class="flex flex-wrap gap-8px">
-          <NButton @click="notify('退回修改')">退回修改</NButton>
-          <NButton type="warning" @click="notify('要求重新生成')">要求重新生成</NButton>
-          <NButton type="primary" @click="notify('教师通过')">教师通过</NButton>
+          <NButton v-if="hasButton('review:approve')" @click="notify('退回修改')">退回修改</NButton>
+          <NButton v-if="hasButton('review:approve')" type="warning" @click="notify('要求重新生成')">
+            要求重新生成
+          </NButton>
+          <NButton v-if="hasButton('review:approve')" type="primary" @click="notify('教师通过')">教师通过</NButton>
         </div>
       </div>
     </NCard>
@@ -48,9 +66,9 @@ function notify(action: string) {
     <NGrid cols="1 xl:3" responsive="screen" :x-gap="16" :y-gap="16">
       <NGi>
         <NCard title="待处理案例" :bordered="false" class="card-wrapper">
-          <div class="flex-col-stretch gap-12px">
+          <div v-if="visibleReviewCases.length" class="flex-col-stretch gap-12px">
             <button
-              v-for="item in reviewCases"
+              v-for="item in visibleReviewCases"
               :key="item.id"
               type="button"
               class="review-item"
@@ -67,11 +85,12 @@ function notify(action: string) {
               </div>
             </button>
           </div>
+          <NEmpty v-else description="当前学校暂无待复审案例" />
         </NCard>
       </NGi>
 
       <NGi span="1 xl:2">
-        <NCard :title="activeReview.title" :bordered="false" class="card-wrapper">
+        <NCard v-if="activeReview" :title="activeReview.title" :bordered="false" class="card-wrapper">
           <div class="grid gap-16px">
             <div class="review-summary">
               <div class="grid gap-6px text-13px text-[#475569]">
@@ -85,9 +104,9 @@ function notify(action: string) {
             <NTabs v-model:value="activeModuleKey" type="segment">
               <NTabPane v-for="item in activeReview.modules" :key="item.key" :name="item.key" :tab="item.title">
                 <div class="module-card">
-                  <p class="text-13px text-[#475569] leading-22px">{{ activeModule.summary }}</p>
+                  <p class="text-13px text-[#475569] leading-22px">{{ activeModule?.summary }}</p>
                   <ul class="module-points">
-                    <li v-for="point in activeModule.points" :key="point">{{ point }}</li>
+                    <li v-for="point in activeModule?.points || []" :key="point">{{ point }}</li>
                   </ul>
                 </div>
               </NTabPane>
@@ -140,6 +159,9 @@ function notify(action: string) {
               </NTimeline>
             </div>
           </div>
+        </NCard>
+        <NCard v-else :bordered="false" class="card-wrapper">
+          <NEmpty description="当前学校暂时没有复审详情可查看" />
         </NCard>
       </NGi>
     </NGrid>

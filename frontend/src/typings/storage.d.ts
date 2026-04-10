@@ -41,5 +41,7 @@ declare namespace StorageType {
     lastLoginUserId: string;
     /** The active mock user key */
     mockUserKey: string;
+    /** The active school id for multi-school demo */
+    selectedSchoolId: string;
   }
 }

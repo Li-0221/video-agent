@@ -6,6 +6,7 @@ import { useThemeStore } from '@/store/modules/theme';
 import GlobalLogo from '../global-logo/index.vue';
 import GlobalBreadcrumb from '../global-breadcrumb/index.vue';
 import ThemeButton from './components/theme-button.vue';
+import SchoolSwitch from './components/school-switch.vue';
 import UserAvatar from './components/user-avatar.vue';
 
 defineOptions({
@@ -37,6 +38,7 @@ const { isFullscreen, toggle } = useFullscreen();
       <GlobalBreadcrumb v-if="!appStore.isMobile" class="ml-12px" />
     </div>
     <div class="h-full flex-y-center justify-end">
+      <SchoolSwitch v-if="!appStore.isMobile" class="mr-12px" />
       <FullScreen v-if="!appStore.isMobile" :full="isFullscreen" @click="toggle" />
       <LangSwitch
         v-if="themeStore.header.multilingual.visible"

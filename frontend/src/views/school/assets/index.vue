@@ -1,5 +1,11 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useSchoolStore } from '@/store/modules/school';
 import { schoolAssets, schoolPresets } from '@/mock/video-platform';
+
+const schoolStore = useSchoolStore();
+
+const visibleAssets = computed(() => schoolAssets.filter(item => item.schoolId === schoolStore.activeSchool.id));
 
 function notify(action: string) {
   window.$message?.success(`${action} 已保存到学校级 mock 配置。`);
@@ -13,7 +19,9 @@ function notify(action: string) {
         <div>
           <h2 class="text-28px text-[#111827] font-700">学校素材与标签</h2>
           <p class="mt-8px text-14px text-[#475569] leading-24px">
-            学校管理员在这里维护校徽、校训、校园背景图和本校红色资源标签。所有学校资产都按学校 ID 隔离，不允许跨校串用。
+            当前学校为
+            {{ schoolStore.activeSchool.schoolName }}。学校管理员在这里维护校徽、校训、校园背景图和本校红色资源标签，
+            所有学校资产都按学校 ID 隔离，不允许跨校串用。
           </p>
         </div>
         <div class="flex flex-wrap gap-8px">
@@ -26,8 +34,18 @@ function notify(action: string) {
     <NGrid cols="1 xl:2" responsive="screen" :x-gap="16" :y-gap="16">
       <NGi>
         <NCard title="学校素材库" :bordered="false" class="card-wrapper">
-          <div class="grid gap-12px">
-            <div v-for="item in schoolAssets" :key="item.id" class="asset-card">
+          <div class="theme-summary">
+            <div>
+              <div class="theme-summary__label">系统名称</div>
+              <div class="theme-summary__value">{{ schoolStore.activeSchool.systemName }}</div>
+            </div>
+            <div>
+              <div class="theme-summary__label">水印文案</div>
+              <div class="theme-summary__value">{{ schoolStore.activeSchool.watermarkText }}</div>
+            </div>
+          </div>
+          <div class="grid mt-12px gap-12px">
+            <div v-for="item in visibleAssets" :key="item.id" class="asset-card">
               <div class="flex items-center justify-between gap-10px">
                 <div>
                   <div class="text-15px text-[#111827] font-600">{{ item.title }}</div>
@@ -38,6 +56,7 @@ function notify(action: string) {
               <p class="mt-8px text-13px text-[#475569] leading-22px">{{ item.description }}</p>
               <div class="mt-8px text-12px text-[#64748b]">{{ item.source }} · {{ item.access }}</div>
             </div>
+            <NEmpty v-if="!visibleAssets.length" description="当前学校还没有配置素材" />
           </div>
         </NCard>
       </NGi>
@@ -71,6 +90,28 @@ function notify(action: string) {
 </template>
 
 <style scoped>
+.theme-summary {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 16px;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid rgb(148 163 184 / 0.16);
+}
+
+.theme-summary__label {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.theme-summary__value {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #111827;
+  font-weight: 600;
+}
+
 .asset-card {
   padding: 16px;
   border-radius: 18px;

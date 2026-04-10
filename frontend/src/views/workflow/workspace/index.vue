@@ -1,9 +1,16 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useAuthStore } from '@/store/modules/auth';
+import { useSchoolStore } from '@/store/modules/school';
+import { useDemoAccess } from '@/hooks/business/demo-access';
 import { gradePresets, knowledgeTags, schoolPresets, templatePresets, videoTasks } from '@/mock/video-platform';
 
+const authStore = useAuthStore();
+const schoolStore = useSchoolStore();
+const { isStudent, isTeacher } = useDemoAccess();
+
 const formModel = reactive({
-  creatorRole: '教师',
+  creatorRole: isStudent.value ? '学生' : '教师',
   gradeBand: '小学 5-6 年级',
   edition: '统编版',
   duration: '3 分钟内',
@@ -37,6 +44,24 @@ const gradeOptions = computed(() =>
 
 const tagOptions = computed(() => knowledgeTags.map(item => ({ label: item, value: item })));
 
+const recentTasks = computed(() =>
+  videoTasks.filter(item => item.schoolId === schoolStore.activeSchool.id).slice(0, 3)
+);
+
+const launchHints = computed(() => {
+  if (isStudent.value) {
+    return {
+      title: '学生发起后会自动转给教师代审',
+      desc: '学生只能提交创意和修改被拦截内容，脚本确认与终审均由教师完成。'
+    };
+  }
+
+  return {
+    title: '教师发起后可直接进入脚本审核链路',
+    desc: '教师拥有逐镜确认、送审与成片放行权限，系统会记录完整审计日志。'
+  };
+});
+
 function submitTask() {
   window.$message?.success('Mock 任务已创建，后续会进入“脚本审核台”和“生成队列”。');
 }
@@ -44,13 +69,26 @@ function submitTask() {
 
 <template>
   <div class="flex-col-stretch gap-16px">
+    <NCard :bordered="false" class="card-wrapper">
+      <div class="flex flex-wrap items-center justify-between gap-12px">
+        <div>
+          <h2 class="text-28px text-[#111827] font-700">视频创作发起台</h2>
+          <p class="mt-8px text-14px text-[#475569] leading-24px">
+            当前学校为 {{ schoolStore.activeSchool.schoolName }}，登录身份是 {{ authStore.userInfo.userName }}。
+            系统会根据角色自动调整默认发起角色、模板说明和后续审核责任。
+          </p>
+        </div>
+        <NTag size="large" :bordered="false" type="info">{{ schoolStore.activeSchool.slogan }}</NTag>
+      </div>
+    </NCard>
+
     <NGrid cols="1 xl:3" responsive="screen" :x-gap="16" :y-gap="16">
       <NGi span="1 xl:2">
-        <NCard title="视频创作发起台" :bordered="false" class="card-wrapper">
+        <NCard title="创作表单" :bordered="false" class="card-wrapper">
           <NForm :model="formModel" label-placement="top">
             <NGrid cols="1 m:2" responsive="screen" :x-gap="16">
               <NFormItemGi label="发起角色">
-                <NRadioGroup v-model:value="formModel.creatorRole" name="creatorRole">
+                <NRadioGroup v-model:value="formModel.creatorRole" name="creatorRole" :disabled="!isTeacher">
                   <NSpace>
                     <NRadioButton value="教师">教师</NRadioButton>
                     <NRadioButton value="学生">学生</NRadioButton>
@@ -88,8 +126,8 @@ function submitTask() {
             class="mt-8 flex flex-wrap items-center justify-between gap-12px rounded-20px bg-[#f8fafc] px-18px py-16px"
           >
             <div>
-              <div class="text-15px text-[#111827] font-600">发起后系统会先做输入审核，再生成结构化脚本供教师确认</div>
-              <div class="mt-8px text-13px text-[#64748b]">如果当前为学生发起，脚本审核权会自动切换给任课教师。</div>
+              <div class="text-15px text-[#111827] font-600">{{ launchHints.title }}</div>
+              <div class="mt-8px text-13px text-[#64748b]">{{ launchHints.desc }}</div>
             </div>
             <NButton type="primary" size="large" round @click="submitTask">创建任务</NButton>
           </div>
@@ -135,7 +173,7 @@ function submitTask() {
       <NGi>
         <NCard title="最近发起任务" :bordered="false" class="card-wrapper">
           <div class="grid gap-12px">
-            <div v-for="item in videoTasks.slice(0, 3)" :key="item.id" class="task-brief">
+            <div v-for="item in recentTasks" :key="item.id" class="task-brief">
               <div class="flex items-center justify-between gap-10px">
                 <div class="text-15px text-[#111827] font-600">{{ item.title }}</div>
                 <NTag size="small" :bordered="false" :type="item.creatorRole === '学生' ? 'warning' : 'success'">

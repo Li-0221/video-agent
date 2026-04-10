@@ -232,6 +232,7 @@ const local: App.I18n.Schema = {
     governance: '审核与发布',
     governance_review: '安全复审',
     governance_library: '视频库审计',
+    governance_rules: '审核规则管理',
     school: '学校定制',
     school_assets: '素材与标签',
     operations: '组织与运营',

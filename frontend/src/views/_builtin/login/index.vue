@@ -4,6 +4,7 @@ import type { Component } from 'vue';
 import { mixColor } from '@sa/color';
 import { loginModuleRecord } from '@/constants/app';
 import { useAppStore } from '@/store/modules/app';
+import { useSchoolStore } from '@/store/modules/school';
 import { useThemeStore } from '@/store/modules/theme';
 import { $t } from '@/locales';
 import PwdLogin from './modules/pwd-login.vue';
@@ -19,6 +20,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const appStore = useAppStore();
+const schoolStore = useSchoolStore();
 const themeStore = useThemeStore();
 
 interface LoginModule {
@@ -57,9 +59,11 @@ const bgThemeColor = computed(() =>
         </div>
 
         <div class="max-w-lg text-center">
-          <h2 class="mb-4 text-42px font-bold leading-tight tracking-wide">{{ $t('system.title') }}</h2>
+          <h2 class="mb-4 text-42px font-bold leading-tight tracking-wide">
+            {{ schoolStore.activeSchool.systemName }}
+          </h2>
           <p class="text-18px text-white/90 font-light leading-relaxed">
-            面向中小学思政课堂的 AI 视频生产平台，覆盖发起、审稿、生成、复审和学校定制。
+            {{ schoolStore.activeSchool.slogan }}，覆盖发起、审稿、生成、复审和学校定制。
           </p>
         </div>
       </div>
@@ -89,13 +93,17 @@ const bgThemeColor = computed(() =>
           <!-- Mobile Logo (Hidden on Desktop) -->
           <div class="mb-10 flex flex-col items-center gap-4 md:hidden">
             <SystemLogo class="text-48px text-primary" />
-            <h3 class="text-24px text-primary font-bold">{{ $t('system.title') }}</h3>
+            <h3 class="text-24px text-primary font-bold">{{ schoolStore.activeSchool.shortName }}</h3>
           </div>
 
           <!-- Welcome Text -->
           <div class="mb-10 text-left">
             <h3 class="mb-3 text-32px text-gray-900 font-bold dark:text-white">{{ $t(activeModule.label) }}</h3>
-            <p class="text-16px text-gray-500 font-medium">使用本地 mock 登录后即可体验教师、学生与学校管理员流程。</p>
+            <p class="text-16px text-gray-500 font-medium">
+              当前演示学校：{{
+                schoolStore.activeSchool.schoolName
+              }}。可使用快捷身份体验教师、学生、学校管理员和平台运营视角。
+            </p>
           </div>
 
           <!-- Transition Wrapper for Form -->

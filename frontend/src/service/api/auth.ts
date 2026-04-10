@@ -16,6 +16,10 @@ function resolveMock<T>(data: T): MockFlatResponse<T> {
 function getMockUserKey(userName?: string) {
   const normalized = (userName || '').toLowerCase();
 
+  if (normalized.includes('ops') || normalized.includes('operator') || normalized.includes('运营')) {
+    return 'ops';
+  }
+
   if (normalized.includes('student') || normalized.includes('学生')) {
     return 'student';
   }

@@ -24,6 +24,13 @@ const model: FormModel = reactive({
   password: '123456'
 });
 
+const demoAccounts = [
+  { label: '教师', userName: 'teacher' },
+  { label: '学生', userName: 'student' },
+  { label: '学校管理员', userName: 'admin' },
+  { label: '平台运营', userName: 'operator' }
+];
+
 const rules = computed<Record<keyof FormModel, App.Global.FormRule[]>>(() => {
   // inside computed to make locale reactive, if not apply i18n, you can define it without computed
   const { formRules } = useFormRules();
@@ -37,6 +44,11 @@ const rules = computed<Record<keyof FormModel, App.Global.FormRule[]>>(() => {
 async function handleSubmit() {
   await validate();
   await authStore.login(model.userName, model.password);
+}
+
+function applyDemoAccount(userName: string) {
+  model.userName = userName;
+  model.password = '123456';
 }
 </script>
 
@@ -53,6 +65,21 @@ async function handleSubmit() {
         :placeholder="$t('page.login.common.passwordPlaceholder')"
       />
     </NFormItem>
+    <div class="mb-16px">
+      <div class="mb-8px text-13px text-[#64748b]">快捷演示身份</div>
+      <div class="flex flex-wrap gap-8px">
+        <NButton
+          v-for="item in demoAccounts"
+          :key="item.userName"
+          size="small"
+          round
+          secondary
+          @click="applyDemoAccount(item.userName)"
+        >
+          {{ item.label }}
+        </NButton>
+      </div>
+    </div>
     <NSpace vertical :size="24">
       <div class="flex-y-center justify-between">
         <NCheckbox>{{ $t('page.login.pwdLogin.rememberMe') }}</NCheckbox>

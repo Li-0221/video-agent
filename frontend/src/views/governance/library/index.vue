@@ -1,12 +1,23 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useSchoolStore } from '@/store/modules/school';
+import { useDemoAccess } from '@/hooks/business/demo-access';
 import { publishItems, reviewCases, videoTasks } from '@/mock/video-platform';
 
-const activePublishId = ref(publishItems[0].id);
+const schoolStore = useSchoolStore();
+const { hasButton, isPlatformOps } = useDemoAccess();
 
-const activePublish = computed(() => publishItems.find(item => item.id === activePublishId.value) || publishItems[0]);
-const linkedTask = computed(() => videoTasks.find(item => item.id === activePublish.value.taskId));
-const linkedReview = computed(() => reviewCases.find(item => item.taskId === activePublish.value.taskId));
+const visiblePublishItems = computed(() =>
+  isPlatformOps.value ? publishItems : publishItems.filter(item => item.schoolId === schoolStore.activeSchool.id)
+);
+
+const activePublishId = ref(visiblePublishItems.value[0]?.id || '');
+
+const activePublish = computed(
+  () => visiblePublishItems.value.find(item => item.id === activePublishId.value) || visiblePublishItems.value[0]
+);
+const linkedTask = computed(() => videoTasks.find(item => item.id === activePublish.value?.taskId));
+const linkedReview = computed(() => reviewCases.find(item => item.taskId === activePublish.value?.taskId));
 
 function getPublishType(status: string): NaiveUI.ThemeColor {
   if (status === 'published') return 'success';
@@ -26,12 +37,19 @@ function notify(action: string) {
         <div>
           <h2 class="text-28px text-[#111827] font-700">视频库与审计中心</h2>
           <p class="mt-8px text-14px text-[#475569] leading-24px">
+            {{
+              isPlatformOps
+                ? '当前为跨校视频库巡检视角。'
+                : `当前仅展示 ${schoolStore.activeSchool.shortName} 的视频库数据。`
+            }}
             通过的视频进入教师视频库；学生发起的视频只有在教师确认后才对学生可见，同时所有关键动作都必须保留审计链路。
           </p>
         </div>
         <div class="flex flex-wrap gap-8px">
-          <NButton @click="notify('导出 MP4')">导出 MP4</NButton>
-          <NButton type="primary" ghost @click="notify('同步学生可见状态')">同步学生可见状态</NButton>
+          <NButton v-if="hasButton('record:view')" @click="notify('导出 MP4')">导出 MP4</NButton>
+          <NButton v-if="hasButton('video:publish')" type="primary" ghost @click="notify('同步学生可见状态')">
+            同步学生可见状态
+          </NButton>
         </div>
       </div>
     </NCard>
@@ -39,9 +57,9 @@ function notify(action: string) {
     <NGrid cols="1 xl:3" responsive="screen" :x-gap="16" :y-gap="16">
       <NGi>
         <NCard title="视频库列表" :bordered="false" class="card-wrapper">
-          <div class="flex-col-stretch gap-12px">
+          <div v-if="visiblePublishItems.length" class="flex-col-stretch gap-12px">
             <button
-              v-for="item in publishItems"
+              v-for="item in visiblePublishItems"
               :key="item.id"
               type="button"
               class="publish-item"
@@ -56,11 +74,12 @@ function notify(action: string) {
               <div class="mt-8px text-12px text-[#475569]">{{ item.version }} · {{ item.updatedAt }}</div>
             </button>
           </div>
+          <NEmpty v-else description="当前学校暂无视频库记录" />
         </NCard>
       </NGi>
 
       <NGi span="1 xl:2">
-        <NCard :title="activePublish.title" :bordered="false" class="card-wrapper">
+        <NCard v-if="activePublish" :title="activePublish.title" :bordered="false" class="card-wrapper">
           <div class="grid gap-16px">
             <div class="grid gap-12px md:grid-cols-2">
               <div class="library-block">
@@ -115,6 +134,9 @@ function notify(action: string) {
               <p class="mt-8px text-13px text-[#475569] leading-22px">{{ linkedReview.notes }}</p>
             </div>
           </div>
+        </NCard>
+        <NCard v-else :bordered="false" class="card-wrapper">
+          <NEmpty description="当前学校暂无可查看的视频发布详情" />
         </NCard>
       </NGi>
     </NGrid>

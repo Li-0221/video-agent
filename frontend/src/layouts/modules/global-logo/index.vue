@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { $t } from '@/locales';
+import { useSchoolStore } from '@/store/modules/school';
 
 defineOptions({
   name: 'GlobalLogo'
@@ -13,6 +13,8 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   showTitle: true
 });
+
+const schoolStore = useSchoolStore();
 </script>
 
 <template>
@@ -22,7 +24,7 @@ withDefaults(defineProps<Props>(), {
       v-show="showTitle"
       class="pl-8px text-nowrap text-16px text-[var(--n-text-color)] font-bold transition duration-300 ease-in-out"
     >
-      {{ $t('system.title') }}
+      {{ schoolStore.activeSchool.systemName }}
     </h2>
   </RouterLink>
 </template>

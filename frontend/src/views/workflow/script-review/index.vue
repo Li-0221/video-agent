@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useSchoolStore } from '@/store/modules/school';
+import { useDemoAccess } from '@/hooks/business/demo-access';
 import { scriptReviewScenes } from '@/mock/video-platform';
 
 const scenes = ref(structuredClone(scriptReviewScenes));
+const schoolStore = useSchoolStore();
+const { hasButton } = useDemoAccess();
 
 function confirmScript() {
   window.$message?.success('脚本已确认，系统可以继续进入素材批量生成阶段。');
@@ -25,11 +29,14 @@ function regenerateScene(sceneTitle: string) {
           <p class="text-12px text-[#64748b] tracking-[0.24em] uppercase">Teacher Required Review</p>
           <h2 class="mt-8px text-28px text-[#111827] font-700">系统已经产出结构化脚本，但必须由教师确认后才能继续</h2>
           <p class="mt-10px max-w-960px text-14px text-[#475569] leading-24px">
-            审稿台覆盖 PRD 中的三个关键动作：逐镜核对旁白与画面、明确修改只影响哪一层素材、
+            当前学校为 {{ schoolStore.activeSchool.schoolName }}。审稿台覆盖 PRD
+            中的三个关键动作：逐镜核对旁白与画面、明确修改只影响哪一层素材、
             以及在点击“确认脚本无误”之前，阻止任何素材批量生成。
           </p>
         </div>
-        <NButton type="primary" round size="large" @click="confirmScript">确认脚本无误</NButton>
+        <NButton v-if="hasButton('script:review')" type="primary" round size="large" @click="confirmScript">
+          确认脚本无误
+        </NButton>
       </div>
     </NCard>
 
@@ -52,8 +59,18 @@ function regenerateScene(sceneTitle: string) {
             <div class="flex flex-wrap items-center justify-between gap-12px">
               <p class="text-13px text-[#64748b] leading-22px">{{ scene.teacherTip }}</p>
               <NSpace>
-                <NButton round @click="regenerateVoice(scene.title)">仅重合成配音</NButton>
-                <NButton type="primary" ghost round @click="regenerateScene(scene.title)">重绘画面并重配音</NButton>
+                <NButton v-if="hasButton('scene:voice-regenerate')" round @click="regenerateVoice(scene.title)">
+                  仅重合成配音
+                </NButton>
+                <NButton
+                  v-if="hasButton('scene:visual-regenerate')"
+                  type="primary"
+                  ghost
+                  round
+                  @click="regenerateScene(scene.title)"
+                >
+                  重绘画面并重配音
+                </NButton>
               </NSpace>
             </div>
           </NCard>

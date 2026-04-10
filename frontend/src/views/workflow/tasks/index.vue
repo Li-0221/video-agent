@@ -1,17 +1,29 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useSchoolStore } from '@/store/modules/school';
+import { useDemoAccess } from '@/hooks/business/demo-access';
 import { videoTasks } from '@/mock/video-platform';
 
-const activeTaskId = ref(videoTasks[0].id);
+const schoolStore = useSchoolStore();
+const { hasButton, isPlatformOps, isStudent } = useDemoAccess();
+
 const statusFilter = ref<'all' | 'draft' | 'generating' | 'review' | 'approved' | 'blocked'>('all');
 
+const scopedTasks = computed(() =>
+  isPlatformOps.value ? videoTasks : videoTasks.filter(item => item.schoolId === schoolStore.activeSchool.id)
+);
+
 const filteredTasks = computed(() => {
+  const source = scopedTasks.value;
+
   if (statusFilter.value === 'all') {
-    return videoTasks;
+    return source;
   }
 
-  return videoTasks.filter(item => item.status === statusFilter.value);
+  return source.filter(item => item.status === statusFilter.value);
 });
+
+const activeTaskId = ref(filteredTasks.value[0]?.id || '');
 
 const activeTask = computed(
   () => filteredTasks.value.find(item => item.id === activeTaskId.value) || filteredTasks.value[0]
@@ -45,7 +57,8 @@ function notify(action: string) {
         <div>
           <h2 class="text-28px text-[#111827] font-700">生成队列与微调中心</h2>
           <p class="mt-8px text-14px text-[#475569] leading-24px">
-            这里承接脚本确认后的自动生成、排队可视化、单镜头重生成、语音与字幕微调，以及最终送审前的状态透出。
+            当前展示 {{ isPlatformOps ? '跨校总览' : `${schoolStore.activeSchool.shortName} 的任务队列` }}，
+            按角色控制“重提、重配音、重绘、送审”等按钮的可见性。
           </p>
         </div>
         <NRadioGroup v-model:value="statusFilter" name="statusFilter">
@@ -128,9 +141,26 @@ function notify(action: string) {
             </div>
 
             <div class="flex flex-wrap gap-12px">
-              <NButton @click="notify('仅重合成配音')">仅重合成配音</NButton>
-              <NButton type="primary" ghost @click="notify('重绘画面并重配音')">重绘画面并重配音</NButton>
-              <NButton type="warning" @click="notify('送入输出复审')">送入输出复审</NButton>
+              <NButton v-if="hasButton('scene:voice-regenerate')" @click="notify('仅重合成配音')">仅重合成配音</NButton>
+              <NButton
+                v-if="hasButton('scene:visual-regenerate')"
+                type="primary"
+                ghost
+                @click="notify('重绘画面并重配音')"
+              >
+                重绘画面并重配音
+              </NButton>
+              <NButton v-if="hasButton('review:approve')" type="warning" @click="notify('送入输出复审')">
+                送入输出复审
+              </NButton>
+              <NButton
+                v-if="isStudent && activeTask.status === 'blocked' && hasButton('task:resubmit')"
+                type="error"
+                ghost
+                @click="notify('修改后重新提交')"
+              >
+                修改后重新提交
+              </NButton>
             </div>
           </div>
         </NCard>

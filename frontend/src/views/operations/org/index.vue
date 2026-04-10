@@ -1,5 +1,13 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useAuthStore } from '@/store/modules/auth';
+import { useSchoolStore } from '@/store/modules/school';
+import { useDemoAccess } from '@/hooks/business/demo-access';
 import { roleProfiles } from '@/mock/video-platform';
+
+const authStore = useAuthStore();
+const schoolStore = useSchoolStore();
+const { isPlatformOps, isSchoolAdmin, isStudent, isTeacher } = useDemoAccess();
 
 const permissionMatrix = [
   ['自由输入指令', '教师', '学生'],
@@ -9,6 +17,27 @@ const permissionMatrix = [
   ['查看全校生成记录', '学校管理员', '-'],
   ['维护全局审核阈值', '平台运营', '-']
 ];
+
+const currentRole = computed(() => {
+  if (isTeacher.value) return '教师';
+  if (isStudent.value) return '学生';
+  if (isSchoolAdmin.value) return '学校管理员';
+  if (isPlatformOps.value) return '平台运营';
+  return '未登录';
+});
+
+const menuMatrix = computed(() => [
+  { menu: '创作发起台', visible: isTeacher.value || isStudent.value, desc: '教师与学生可见，学生仅能提交与重提。' },
+  { menu: '脚本审核台', visible: isTeacher.value, desc: '仅教师拥有逐镜审核权。' },
+  { menu: '生成队列', visible: isTeacher.value || isStudent.value, desc: '教师可微调，学生仅查看和重提。' },
+  { menu: '安全复审', visible: isTeacher.value || isPlatformOps.value, desc: '教师负责终审，平台运营可跨校巡检。' },
+  {
+    menu: '审核规则管理',
+    visible: isSchoolAdmin.value || isPlatformOps.value,
+    desc: '学校管理员看校级规则，平台运营看全局规则。'
+  },
+  { menu: '学校素材与标签', visible: isSchoolAdmin.value, desc: '仅学校管理员维护校徽、校训和校园背景。' }
+]);
 </script>
 
 <template>
@@ -18,6 +47,13 @@ const permissionMatrix = [
       <p class="mt-8px text-14px text-[#475569] leading-24px">
         平台围绕教师、学生、学校管理员、平台运营四种核心角色设计，权限控制强调“学生可参与创作，但不拥有审稿权与终审权”。
       </p>
+      <div class="current-role-bar">
+        <div>
+          <div class="current-role-bar__label">当前登录</div>
+          <div class="current-role-bar__value">{{ authStore.userInfo.userName }} / {{ currentRole }}</div>
+        </div>
+        <NTag size="large" :bordered="false" type="info">{{ schoolStore.activeSchool.schoolName }}</NTag>
+      </div>
     </NCard>
 
     <NGrid cols="1 l:2" responsive="screen" :x-gap="16" :y-gap="16">
@@ -54,10 +90,47 @@ const permissionMatrix = [
         </table>
       </div>
     </NCard>
+
+    <NCard title="演示菜单可见性" :bordered="false" class="card-wrapper">
+      <div class="grid gap-12px">
+        <div v-for="item in menuMatrix" :key="item.menu" class="capability-pill justify-between">
+          <div>
+            <div class="text-14px text-[#111827] font-600">{{ item.menu }}</div>
+            <div class="mt-4px text-12px text-[#64748b]">{{ item.desc }}</div>
+          </div>
+          <NTag :bordered="false" :type="item.visible ? 'success' : 'default'">
+            {{ item.visible ? '当前可见' : '当前隐藏' }}
+          </NTag>
+        </div>
+      </div>
+    </NCard>
   </div>
 </template>
 
 <style scoped>
+.current-role-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #f8fafc;
+}
+
+.current-role-bar__label {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.current-role-bar__value {
+  margin-top: 4px;
+  font-size: 16px;
+  color: #111827;
+  font-weight: 700;
+}
+
 .capability-pill {
   display: inline-flex;
   align-items: center;

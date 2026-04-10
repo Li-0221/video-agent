@@ -71,6 +71,15 @@ export const generatedRoutes: GeneratedRoute[] = [
           icon: 'mdi:file-search-outline',
           order: 1
         }
+      },
+      {
+        name: 'governance_rules',
+        path: '/governance/rules',
+        component: 'view.governance_rules',
+        meta: {
+          title: 'governance_rules',
+          i18nKey: 'route.governance_rules'
+        }
       }
     ]
   },
