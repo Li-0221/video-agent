@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import { useSchoolStore } from '@/store/modules/school';
 import { useDemoAccess } from '@/hooks/business/demo-access';
-import { publishItems, reviewCases, videoTasks } from '@/mock/video-platform';
+import { libraryAuditSnapshots, publishItems, reviewCases, videoTasks } from '@/mock/video-platform';
 
 const schoolStore = useSchoolStore();
 const { hasButton, isPlatformOps } = useDemoAccess();
@@ -18,6 +18,9 @@ const activePublish = computed(
 );
 const linkedTask = computed(() => videoTasks.find(item => item.id === activePublish.value?.taskId));
 const linkedReview = computed(() => reviewCases.find(item => item.taskId === activePublish.value?.taskId));
+const activeSnapshot = computed(() =>
+  activePublish.value ? libraryAuditSnapshots[activePublish.value.taskId] : undefined
+);
 
 function getPublishType(status: string): NaiveUI.ThemeColor {
   if (status === 'published') return 'success';
@@ -42,7 +45,7 @@ function notify(action: string) {
                 ? '当前为跨校视频库巡检视角。'
                 : `当前仅展示 ${schoolStore.activeSchool.shortName} 的视频库数据。`
             }}
-            通过的视频进入教师视频库；学生发起的视频只有在教师确认后才对学生可见，同时所有关键动作都必须保留审计链路。
+            通过的视频进入教师视频库；学生发起的视频只有在教师确认后才对学生可见，同时所有关键动作都保留审计链路。
           </p>
         </div>
         <div class="flex flex-wrap gap-8px">
@@ -102,28 +105,35 @@ function notify(action: string) {
               </div>
             </div>
 
+            <div v-if="activeSnapshot" class="library-block">
+              <div class="text-14px text-[#111827] font-600">课堂使用与留存策略</div>
+              <div class="grid mt-12px gap-10px md:grid-cols-2">
+                <div class="snapshot-item">
+                  <div class="snapshot-item__label">课堂使用方式</div>
+                  <div class="snapshot-item__value">{{ activeSnapshot.classroomUse }}</div>
+                </div>
+                <div class="snapshot-item">
+                  <div class="snapshot-item__label">留存策略</div>
+                  <div class="snapshot-item__value">{{ activeSnapshot.retention }}</div>
+                </div>
+              </div>
+              <div class="mt-12px flex flex-wrap gap-8px">
+                <span v-for="item in activeSnapshot.restrictions" :key="item" class="rule-pill">{{ item }}</span>
+              </div>
+            </div>
+
             <div class="library-block">
               <div class="text-14px text-[#111827] font-600">审计动作流</div>
               <NTimeline class="mt-12px">
-                <NTimelineItem type="info">
-                  <template #header>脚本确认完成</template>
+                <NTimelineItem
+                  v-for="item in activeSnapshot?.auditTrail || []"
+                  :key="`${item.time}-${item.title}`"
+                  type="info"
+                >
+                  <template #header>{{ item.title }}</template>
                   <template #default>
-                    <div>教师完成逐镜审稿，允许进入素材批量生成。</div>
-                    <div class="timeline-time">昨天 16:48</div>
-                  </template>
-                </NTimelineItem>
-                <NTimelineItem type="success">
-                  <template #header>终审通过</template>
-                  <template #default>
-                    <div>教师完成完整看片与结果确认，视频进入视频库。</div>
-                    <div class="timeline-time">昨天 17:38</div>
-                  </template>
-                </NTimelineItem>
-                <NTimelineItem type="success">
-                  <template #header>学生可见同步</template>
-                  <template #default>
-                    <div>仅学生发起的作品需要这一步；教师发起作品默认进入教师视频库。</div>
-                    <div class="timeline-time">今天 09:20</div>
+                    <div>{{ item.desc }}</div>
+                    <div class="timeline-time">{{ item.time }}</div>
                   </template>
                 </NTimelineItem>
               </NTimeline>
@@ -145,7 +155,8 @@ function notify(action: string) {
 
 <style scoped>
 .publish-item,
-.library-block {
+.library-block,
+.snapshot-item {
   padding: 16px;
   border-radius: 18px;
   border: 1px solid rgb(148 163 184 / 0.16);
@@ -162,8 +173,33 @@ function notify(action: string) {
   box-shadow: 0 8px 28px rgb(34 197 94 / 0.08);
 }
 
-.library-block {
+.library-block,
+.snapshot-item {
   background: #f8fafc;
+}
+
+.snapshot-item__label {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.snapshot-item__value {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #334155;
+}
+
+.rule-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: #fff;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgb(148 163 184 / 0.18);
 }
 
 .timeline-time {

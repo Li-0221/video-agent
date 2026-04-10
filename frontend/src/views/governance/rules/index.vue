@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useSchoolStore } from '@/store/modules/school';
 import { useDemoAccess } from '@/hooks/business/demo-access';
-import { reviewRules } from '@/mock/video-platform';
+import { reviewRules, ruleSimulationCases } from '@/mock/video-platform';
 
 defineOptions({
   name: 'GovernanceRules'
@@ -11,9 +11,29 @@ defineOptions({
 const schoolStore = useSchoolStore();
 const { hasButton, isPlatformOps } = useDemoAccess();
 
+const rulesModel = ref(structuredClone(reviewRules));
+const selectedScenarioId = ref(ruleSimulationCases[0].id);
+
 const visibleRules = computed(() =>
-  isPlatformOps.value ? reviewRules : reviewRules.filter(item => item.scope === '学校')
+  isPlatformOps.value ? rulesModel.value : rulesModel.value.filter(item => item.scope === '学校')
 );
+
+const selectedScenario = computed(
+  () => ruleSimulationCases.find(item => item.id === selectedScenarioId.value) || ruleSimulationCases[0]
+);
+
+const hitRules = computed(() =>
+  visibleRules.value.filter(item => selectedScenario.value.hitRuleIds.includes(item.id) && item.enabled)
+);
+
+const simulatedResult = computed(() => {
+  const totalWeight = hitRules.value.reduce((sum, item) => sum + item.weight, 0);
+
+  if (totalWeight >= 90) return '直接拦截';
+  if (totalWeight >= 60) return '进入人工复审';
+  if (totalWeight >= 20) return '提示后继续';
+  return '默认放行';
+});
 
 const ruleSummary = computed(() => {
   const highRiskCount = visibleRules.value.filter(item => item.riskLevel === '高').length;
@@ -51,7 +71,7 @@ function notify(action: string, ruleName: string) {
                 ? '平台运营可维护全局规则和权重阈值。'
                 : `当前仅展示 ${schoolStore.activeSchool.shortName} 的学校侧规则。`
             }}
-            页面重点演示规则描述、作用阶段、权重、命中说明以及启停状态。
+            这个页面除了展示规则列表，也支持现场演示“改权重、关开关、看命中结果”的业务价值。
           </p>
         </div>
         <div class="flex flex-wrap gap-8px">
@@ -95,10 +115,15 @@ function notify(action: string, ruleName: string) {
                   </div>
                   <p class="mt-8px text-13px text-[#475569] leading-22px">{{ rule.description }}</p>
                 </div>
-                <div class="weight-badge">
-                  <span>权重</span>
-                  <strong>{{ rule.weight }}</strong>
+                <NSwitch v-model:value="rule.enabled" />
+              </div>
+
+              <div class="mt-14px">
+                <div class="mb-8px flex items-center justify-between gap-10px">
+                  <span class="text-12px text-[#64748b]">规则权重</span>
+                  <span class="text-18px text-[#111827] font-700">{{ rule.weight }}</span>
                 </div>
+                <NSlider v-model:value="rule.weight" :min="0" :max="100" :step="5" />
               </div>
 
               <div class="grid mt-14px gap-10px md:grid-cols-2">
@@ -115,10 +140,10 @@ function notify(action: string, ruleName: string) {
               <div class="mt-14px flex flex-wrap items-center justify-between gap-12px">
                 <NSpace>
                   <NButton v-if="hasButton('rules:manage')" size="small" @click="notify('编辑规则', rule.name)">
-                    编辑权重
+                    编辑规则
                   </NButton>
                   <NButton v-if="hasButton('rules:manage')" size="small" ghost @click="notify('调整说明', rule.name)">
-                    修改描述
+                    修改说明
                   </NButton>
                   <NButton
                     v-if="hasButton('rules:school-view')"
@@ -140,30 +165,52 @@ function notify(action: string, ruleName: string) {
 
       <NGi>
         <div class="flex-col-stretch gap-16px">
-          <NCard title="规则生效逻辑" :bordered="false" class="card-wrapper">
-            <ul class="guide-list">
-              <li>全局规则优先处理跨校一致性的红线问题，例如政治敏感表达和历史人物复审。</li>
-              <li>学校规则用于品牌完整性、学段表达适配和校本素材要求。</li>
-              <li>权重越高，越容易在命中说明和处理建议中被优先展示。</li>
-              <li>平台运营可改权重与阈值，学校管理员重点查看学校侧规则说明。</li>
-            </ul>
+          <NCard title="命中结果模拟器" :bordered="false" class="card-wrapper">
+            <NForm label-placement="top">
+              <NFormItem label="演示场景">
+                <NSelect
+                  v-model:value="selectedScenarioId"
+                  :options="ruleSimulationCases.map(item => ({ label: item.title, value: item.id }))"
+                />
+              </NFormItem>
+            </NForm>
+
+            <div class="sim-card">
+              <div class="text-15px text-[#111827] font-700">{{ selectedScenario.title }}</div>
+              <p class="mt-8px text-13px text-[#475569] leading-22px">{{ selectedScenario.summary }}</p>
+              <div class="mt-10px text-12px text-[#64748b]">推荐动作：{{ selectedScenario.recommendation }}</div>
+            </div>
+
+            <div class="sim-result">
+              <div>
+                <div class="text-12px text-[#64748b]">命中规则</div>
+                <div class="mt-8px flex flex-wrap gap-8px">
+                  <NTag
+                    v-for="item in hitRules"
+                    :key="item.id"
+                    size="small"
+                    :bordered="false"
+                    :type="getRiskType(item.riskLevel)"
+                  >
+                    {{ item.name }}
+                  </NTag>
+                </div>
+              </div>
+              <div>
+                <div class="text-12px text-[#64748b]">模拟结果</div>
+                <div class="mt-6px text-18px text-[#111827] font-700">{{ simulatedResult }}</div>
+                <div class="mt-6px text-12px text-[#64748b]">场景风险分：{{ selectedScenario.riskScore }}</div>
+              </div>
+            </div>
           </NCard>
 
           <NCard title="演示建议" :bordered="false" class="card-wrapper">
-            <div class="grid gap-10px">
-              <div class="rule-detail">
-                <div class="rule-detail__label">教师视角</div>
-                <div class="rule-detail__value">只看到命中的复审结果，不直接维护规则。</div>
-              </div>
-              <div class="rule-detail">
-                <div class="rule-detail__label">学校管理员视角</div>
-                <div class="rule-detail__value">可查看学校规则的权重与描述，说明为什么品牌素材必须补齐。</div>
-              </div>
-              <div class="rule-detail">
-                <div class="rule-detail__label">平台运营视角</div>
-                <div class="rule-detail__value">可跨校调整全局权重，演示“改完立即生效”的产品价值。</div>
-              </div>
-            </div>
+            <ul class="guide-list">
+              <li>先展示全局规则和学校规则的差异，说明平台和学校的责任边界。</li>
+              <li>再切换模拟场景，实时调整权重或关闭规则，说明结果会立即变化。</li>
+              <li>教师视角只看命中结果；学校管理员看学校规则；平台运营才看完整权重。</li>
+              <li>现场讲解时，优先用“历史人物复审”和“学生输入拦截”两个场景最容易理解。</li>
+            </ul>
           </NCard>
         </div>
       </NGi>
@@ -174,7 +221,9 @@ function notify(action: string, ruleName: string) {
 <style scoped>
 .summary-card,
 .rule-card,
-.rule-detail {
+.rule-detail,
+.sim-card,
+.sim-result {
   border-radius: 18px;
   border: 1px solid rgb(148 163 184 / 0.16);
   background: #fff;
@@ -184,9 +233,17 @@ function notify(action: string, ruleName: string) {
   padding: 18px;
 }
 
-.rule-detail {
+.rule-detail,
+.sim-card,
+.sim-result {
   padding: 14px 16px;
   background: #f8fafc;
+}
+
+.sim-result {
+  margin-top: 12px;
+  display: grid;
+  gap: 12px;
 }
 
 .rule-detail__label {
@@ -199,26 +256,6 @@ function notify(action: string, ruleName: string) {
   font-size: 13px;
   line-height: 1.8;
   color: #334155;
-}
-
-.weight-badge {
-  min-width: 82px;
-  display: grid;
-  justify-items: center;
-  padding: 10px 14px;
-  border-radius: 16px;
-  background: linear-gradient(180deg, #fff7ed 0%, #fffbeb 100%);
-  color: #9a3412;
-}
-
-.weight-badge span {
-  font-size: 11px;
-}
-
-.weight-badge strong {
-  margin-top: 4px;
-  font-size: 24px;
-  line-height: 1;
 }
 
 .guide-list {

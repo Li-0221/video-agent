@@ -5,12 +5,15 @@ import { useSchoolStore } from '@/store/modules/school';
 import { useDemoAccess } from '@/hooks/business/demo-access';
 import {
   acceptanceChecklist,
+  deliveryPhases,
+  inputAuditCheckpoints,
   platformMetrics,
   quotaMetrics,
   reviewCases,
   roleProfiles,
   schoolAssets,
   schoolThemeProfiles,
+  techArchitectureLayers,
   videoTasks,
   workflowStages
 } from '@/mock/video-platform';
@@ -41,12 +44,12 @@ const roleLabel = computed(() => {
 });
 
 const heroTags = computed(() => {
-  const baseTags = ['菜单按角色裁剪', '按钮按权限显示', '看板按学校过滤'];
+  const baseTags = ['菜单按角色裁剪', '按钮按权限显示', '学校资产隔离', '全链路审计'];
 
-  if (isTeacher.value) return [...baseTags, '教师强制审稿', '终审责任在教师'];
-  if (isStudent.value) return [...baseTags, '仅可发起与重提', '无脚本审核权限'];
-  if (isSchoolAdmin.value) return [...baseTags, '学校素材隔离', '品牌主题切换'];
-  if (isPlatformOps.value) return [...baseTags, '跨校巡检', '全局规则权重管理'];
+  if (isTeacher.value) return [...baseTags, '教师强制审稿', '单镜头微调', '教师终审负责'];
+  if (isStudent.value) return [...baseTags, '仅可提交与重提', '作品需教师确认后可见', '每日 2 次配额'];
+  if (isSchoolAdmin.value) return [...baseTags, '校徽校训配置', '学校规则查看', '多学校主题切换'];
+  if (isPlatformOps.value) return [...baseTags, '跨校巡检', '全局规则调权', '技术与成本总览'];
 
   return baseTags;
 });
@@ -61,9 +64,14 @@ const focusCards = computed(() => {
         desc: '支持只重配音或重绘画面。'
       },
       {
-        label: '高风险提醒',
+        label: '输入拦截提醒',
         value: `${currentTasks.value.filter(item => item.status === 'blocked').length} 个`,
-        desc: '输入阶段拦截会直接回流到教师视角。'
+        desc: '学生违规输入会直接回流到教师视角。'
+      },
+      {
+        label: '品牌素材',
+        value: `${currentSchoolAssets.value.length} 项`,
+        desc: '校徽、校训和校园背景会自动参与提示词注入。'
       }
     ];
   }
@@ -80,7 +88,12 @@ const focusCards = computed(() => {
         value: `${currentTasks.value.filter(item => item.status === 'blocked').length} 个`,
         desc: '学生只能修改后重新提交，不能直接放行。'
       },
-      { label: '校内模板', value: `${currentSchoolAssets.value.length} 项`, desc: '素材由教师和学校管理员预先配置。' }
+      {
+        label: '配额剩余',
+        value: '1 / 2',
+        desc: '超过每日上限后系统会直接拒绝新建任务。'
+      },
+      { label: '本校模板', value: `${currentSchoolAssets.value.length} 项`, desc: '学校提前配置好的素材会自动生效。' }
     ];
   }
 
@@ -89,17 +102,23 @@ const focusCards = computed(() => {
       {
         label: '本校素材',
         value: `${currentSchoolAssets.value.length} 项`,
-        desc: '校徽、校训、校园背景与标签全部按学校隔离。'
+        desc: '校徽、校训、校园背景与学校标签全部按学校隔离。'
       },
-      { label: '启用规则', value: '4 条', desc: '可查看学校侧规则说明与权重对业务的影响。' },
-      { label: '品牌主题', value: schoolStore.activeSchool.shortName, desc: '切换学校即可同步主题色、系统名和水印。' }
+      { label: '学校规则', value: '2 条', desc: '学校管理员主要查看和解释规则，不直接做跨校调权。' },
+      {
+        label: '品牌主题',
+        value: schoolStore.activeSchool.shortName,
+        desc: '切换学校即可同步主题色、系统名和水印内容。'
+      },
+      { label: '视频库记录', value: `${currentTasks.value.length} 条`, desc: '学校侧能看见本校视频与生成记录。' }
     ];
   }
 
   return [
     { label: '已接学校', value: `${schoolThemeProfiles.length} 所`, desc: '平台运营可跨校查看演示数据和品牌配置。' },
     { label: '全局规则', value: '2 条', desc: '聚焦跨校复审策略与审核阈值。' },
-    { label: '待巡检案例', value: `${reviewCases.length} 个`, desc: '支持跨学校抽查高风险视频和命中规则。' }
+    { label: '待巡检案例', value: `${reviewCases.length} 个`, desc: '支持跨学校抽查高风险视频和命中规则。' },
+    { label: '任务总量', value: `${videoTasks.length} 条`, desc: '所有任务都统一纳入编排与审计链路。' }
   ];
 });
 
@@ -110,6 +129,20 @@ const constraintMetrics = computed(() =>
     desc: item.desc
   }))
 );
+
+const visibleArchitectureLayers = computed(() =>
+  isTeacher.value || isStudent.value ? techArchitectureLayers.slice(0, 3) : techArchitectureLayers
+);
+
+const visibleAuditCheckpoints = computed(() =>
+  isSchoolAdmin.value ? inputAuditCheckpoints.filter(item => item.type !== 'block') : inputAuditCheckpoints
+);
+
+function getCheckpointType(type: string): NaiveUI.ThemeColor {
+  if (type === 'block') return 'error';
+  if (type === 'warn') return 'warning';
+  return 'success';
+}
 </script>
 
 <template>
@@ -119,8 +152,9 @@ const constraintMetrics = computed(() =>
         <p class="hero-kicker">{{ schoolStore.activeSchool.schoolName }} · {{ roleLabel }}视角</p>
         <h2 class="hero-title">{{ schoolStore.activeSchool.systemName }}</h2>
         <p class="hero-desc">
-          当前登录人为 {{ authStore.userInfo.userName }}。看板会按照角色与学校双重维度做裁剪，同一套页面能演示教师创作、
-          学生提交、学校品牌配置和平台运营巡检四种工作方式。
+          当前登录人为 {{ authStore.userInfo.userName }}。这套 demo
+          会把“教师主导创作、学生参与提交、学校做品牌配置、平台做安全巡检” 统一收在一套多角色系统里，所有数据都来自本地
+          mock。
         </p>
         <div class="hero-tags">
           <span v-for="tag in heroTags" :key="tag">{{ tag }}</span>
@@ -188,6 +222,36 @@ const constraintMetrics = computed(() =>
 
     <NGrid cols="1 xl:2" responsive="screen" :x-gap="16" :y-gap="16">
       <NGi>
+        <NCard title="输入与输出安全防线" :bordered="false" class="card-wrapper">
+          <div class="grid gap-12px">
+            <div v-for="item in visibleAuditCheckpoints" :key="item.id" class="audit-card">
+              <div class="flex items-center justify-between gap-12px">
+                <div class="text-15px text-[#111827] font-700">{{ item.title }}</div>
+                <NTag :bordered="false" size="small" :type="getCheckpointType(item.type)">{{ item.type }}</NTag>
+              </div>
+              <p class="mt-8px text-13px text-[#475569] leading-22px">{{ item.summary }}</p>
+              <p class="mt-6px text-12px text-[#64748b] leading-20px">{{ item.detail }}</p>
+            </div>
+          </div>
+        </NCard>
+      </NGi>
+      <NGi>
+        <NCard title="后端能力拆解" :bordered="false" class="card-wrapper">
+          <div class="grid gap-12px">
+            <div v-for="layer in visibleArchitectureLayers" :key="layer.id" class="architecture-card">
+              <div class="text-15px text-[#111827] font-700">{{ layer.title }}</div>
+              <p class="mt-8px text-13px text-[#475569] leading-22px">{{ layer.summary }}</p>
+              <div class="mt-10px flex flex-wrap gap-8px">
+                <span v-for="item in layer.items" :key="item" class="tag-pill">{{ item }}</span>
+              </div>
+            </div>
+          </div>
+        </NCard>
+      </NGi>
+    </NGrid>
+
+    <NGrid cols="1 xl:2" responsive="screen" :x-gap="16" :y-gap="16">
+      <NGi>
         <NCard title="非功能约束" :bordered="false" class="card-wrapper">
           <div class="grid gap-12px md:grid-cols-2">
             <div v-for="item in constraintMetrics" :key="item.title" class="quota-card">
@@ -206,6 +270,31 @@ const constraintMetrics = computed(() =>
         </NCard>
       </NGi>
     </NGrid>
+
+    <NCard title="实施路径" :bordered="false" class="card-wrapper">
+      <NGrid cols="1 xl:3" responsive="screen" :x-gap="16" :y-gap="16">
+        <NGi v-for="phase in deliveryPhases" :key="phase.id">
+          <div class="phase-card">
+            <div class="phase-kicker">{{ phase.phase }}</div>
+            <h3 class="mt-8px text-18px text-[#111827] font-700">{{ phase.goal }}</h3>
+            <div class="grid mt-14px gap-10px">
+              <div class="phase-block">
+                <div class="phase-block__label">建设范围</div>
+                <div class="phase-block__value">{{ phase.scope }}</div>
+              </div>
+              <div class="phase-block">
+                <div class="phase-block__label">阶段里程碑</div>
+                <div class="phase-block__value">{{ phase.milestone }}</div>
+              </div>
+              <div class="phase-block">
+                <div class="phase-block__label">风险控制</div>
+                <div class="phase-block__value">{{ phase.riskControl }}</div>
+              </div>
+            </div>
+          </div>
+        </NGi>
+      </NGrid>
+    </NCard>
   </div>
 </template>
 
@@ -324,7 +413,10 @@ const constraintMetrics = computed(() =>
 
 .metric-card,
 .quota-card,
-.role-card {
+.role-card,
+.audit-card,
+.architecture-card,
+.phase-card {
   border-radius: 20px;
   background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
 }
@@ -356,7 +448,10 @@ const constraintMetrics = computed(() =>
 }
 
 .role-card,
-.quota-card {
+.quota-card,
+.audit-card,
+.architecture-card,
+.phase-card {
   padding: 16px;
   border: 1px solid rgb(148 163 184 / 0.16);
 }
@@ -372,6 +467,33 @@ const constraintMetrics = computed(() =>
 .acceptance-list li {
   font-size: 13px;
   line-height: 1.8;
+}
+
+.phase-kicker {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.phase-block {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid rgb(148 163 184 / 0.14);
+}
+
+.phase-block__label {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.phase-block__value {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #334155;
 }
 
 @media (max-width: 1280px) {

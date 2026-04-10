@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { quotaMetrics } from '@/mock/video-platform';
+import { deliveryPhases, quotaMetrics, techArchitectureLayers } from '@/mock/video-platform';
 
 const costBreakdown = [
   { label: '文本脚本生成', value: '18%', desc: '自然语言生成脚本与知识点注入' },
@@ -12,9 +12,9 @@ const costBreakdown = [
 <template>
   <div class="flex-col-stretch gap-16px">
     <NCard :bordered="false" class="card-wrapper">
-      <h2 class="text-28px text-[#111827] font-700">配额、队列与成本</h2>
+      <h2 class="text-28px text-[#111827] font-700">配额、队列、成本与技术路线</h2>
       <p class="mt-8px text-14px text-[#475569] leading-24px">
-        MVP 阶段必须把并发、排队、留存、时延和成本控制放在前台，因为它们直接决定这个系统能不能在学校场景里稳定落地。
+        这个页面把后端技术实施路径也拉进前端 demo 里，方便在现场同时讲清楚“为什么产品能跑起来”和“为什么后续可以扩展”。
       </p>
     </NCard>
 
@@ -62,18 +62,88 @@ const costBreakdown = [
         </NCard>
       </NGi>
     </NGrid>
+
+    <NCard title="后端能力架构" :bordered="false" class="card-wrapper">
+      <NGrid cols="1 xl:3" responsive="screen" :x-gap="16" :y-gap="16">
+        <NGi v-for="item in techArchitectureLayers" :key="item.id">
+          <div class="ops-cost">
+            <div class="text-16px text-[#111827] font-700">{{ item.title }}</div>
+            <p class="mt-8px text-13px text-[#475569] leading-22px">{{ item.summary }}</p>
+            <div class="mt-10px flex flex-wrap gap-8px">
+              <span v-for="tag in item.items" :key="tag" class="ops-pill">{{ tag }}</span>
+            </div>
+          </div>
+        </NGi>
+      </NGrid>
+    </NCard>
+
+    <NCard title="实施路径" :bordered="false" class="card-wrapper">
+      <div class="grid gap-12px">
+        <div v-for="item in deliveryPhases" :key="item.id" class="phase-card">
+          <div class="flex flex-wrap items-start justify-between gap-12px">
+            <div>
+              <div class="text-12px text-[#64748b] tracking-[0.18em] uppercase">{{ item.phase }}</div>
+              <div class="mt-8px text-18px text-[#111827] font-700">{{ item.goal }}</div>
+            </div>
+            <NTag size="small" :bordered="false" type="info">{{ item.scope }}</NTag>
+          </div>
+          <div class="grid mt-12px gap-10px md:grid-cols-2">
+            <div class="phase-block">
+              <div class="phase-block__label">里程碑</div>
+              <div class="phase-block__value">{{ item.milestone }}</div>
+            </div>
+            <div class="phase-block">
+              <div class="phase-block__label">风险控制</div>
+              <div class="phase-block__value">{{ item.riskControl }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </NCard>
   </div>
 </template>
 
 <style scoped>
 .ops-card,
-.ops-cost {
+.ops-cost,
+.phase-card,
+.phase-block {
   border-radius: 18px;
   background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
 }
 
-.ops-cost {
+.ops-cost,
+.phase-card,
+.phase-block {
   padding: 16px;
   border: 1px solid rgb(148 163 184 / 0.16);
+}
+
+.ops-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgb(148 163 184 / 0.18);
+}
+
+.phase-block {
+  background: #f8fafc;
+}
+
+.phase-block__label {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.phase-block__value {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #334155;
 }
 </style>

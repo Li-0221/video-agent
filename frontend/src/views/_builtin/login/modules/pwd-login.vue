@@ -25,10 +25,10 @@ const model: FormModel = reactive({
 });
 
 const demoAccounts = [
-  { label: '教师', userName: 'teacher' },
-  { label: '学生', userName: 'student' },
-  { label: '学校管理员', userName: 'admin' },
-  { label: '平台运营', userName: 'operator' }
+  { label: '教师', userName: 'teacher', desc: '发起任务、强制审稿、终审放行' },
+  { label: '学生', userName: 'student', desc: '提交作业、查看可见作品、违规重提' },
+  { label: '学校管理员', userName: 'admin', desc: '维护校徽校训、学校素材和标签' },
+  { label: '平台运营', userName: 'operator', desc: '跨校巡检、规则调权、治理运营' }
 ];
 
 const rules = computed<Record<keyof FormModel, App.Global.FormRule[]>>(() => {
@@ -67,16 +67,19 @@ function applyDemoAccount(userName: string) {
     </NFormItem>
     <div class="mb-16px">
       <div class="mb-8px text-13px text-[#64748b]">快捷演示身份</div>
-      <div class="flex flex-wrap gap-8px">
+      <div class="grid gap-10px">
         <NButton
           v-for="item in demoAccounts"
           :key="item.userName"
           size="small"
-          round
-          secondary
+          class="demo-role-btn"
+          tertiary
           @click="applyDemoAccount(item.userName)"
         >
-          {{ item.label }}
+          <div class="demo-role-btn__content">
+            <div class="demo-role-btn__title">{{ item.label }}</div>
+            <div class="demo-role-btn__desc">{{ item.desc }}</div>
+          </div>
         </NButton>
       </div>
     </div>
@@ -102,4 +105,30 @@ function applyDemoAccount(userName: string) {
   </NForm>
 </template>
 
-<style scoped></style>
+<style scoped>
+.demo-role-btn {
+  justify-content: flex-start;
+  height: auto;
+  padding: 10px 12px;
+  border-radius: 18px;
+}
+
+.demo-role-btn__content {
+  display: grid;
+  gap: 4px;
+  text-align: left;
+}
+
+.demo-role-btn__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.demo-role-btn__desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #64748b;
+  white-space: normal;
+}
+</style>

@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import { useSchoolStore } from '@/store/modules/school';
 import { useDemoAccess } from '@/hooks/business/demo-access';
-import { reviewCases } from '@/mock/video-platform';
+import { reviewCases, reviewDecisionGuides } from '@/mock/video-platform';
 
 const schoolStore = useSchoolStore();
 const { hasButton, isPlatformOps } = useDemoAccess();
@@ -13,12 +13,17 @@ const visibleReviewCases = computed(() =>
 
 const activeReviewId = ref(visibleReviewCases.value[0]?.id || '');
 const activeModuleKey = ref<'text' | 'image' | 'video' | 'audio'>('video');
+const decision = ref('approve');
+const decisionNote = ref('建议修订历史人物字幕中的绝对化表述后通过。');
 
 const activeReview = computed(
   () => visibleReviewCases.value.find(item => item.id === activeReviewId.value) || visibleReviewCases.value[0]
 );
 const activeModule = computed(
   () => activeReview.value?.modules.find(item => item.key === activeModuleKey.value) || activeReview.value?.modules?.[0]
+);
+const activeDecisionGuide = computed(
+  () => reviewDecisionGuides.find(item => item.id === decision.value) || reviewDecisionGuides[0]
 );
 
 function getSeverityType(level: string): NaiveUI.ThemeColor {
@@ -50,7 +55,7 @@ function notify(action: string) {
                 ? '平台运营可跨校巡检高风险案例。'
                 : `当前仅展示 ${schoolStore.activeSchool.shortName} 的复审案例。`
             }}
-            集中处理输入拦截、0.6~0.9 置信度复审、0.9 自动拦截，以及历史人物全量教师复核等关键安全规则。
+            这里聚合输入拦截、0.6~0.9 置信度复审、0.9 自动拦截，以及历史人物全量教师复核等关键安全规则。
           </p>
         </div>
         <div class="flex flex-wrap gap-8px">
@@ -101,6 +106,19 @@ function notify(action: string) {
               <p class="mt-10px text-13px text-[#334155] leading-22px">{{ activeReview.notes }}</p>
             </div>
 
+            <div class="decision-matrix">
+              <div v-for="item in reviewDecisionGuides" :key="item.id" class="decision-card">
+                <div class="flex items-center justify-between gap-10px">
+                  <div class="text-14px text-[#111827] font-700">{{ item.label }}</div>
+                  <NTag size="small" :bordered="false" :type="item.id === decision ? 'warning' : 'default'">
+                    {{ item.action }}
+                  </NTag>
+                </div>
+                <div class="mt-8px text-12px text-[#64748b]">{{ item.when }}</div>
+                <div class="mt-6px text-13px text-[#475569] leading-22px">{{ item.desc }}</div>
+              </div>
+            </div>
+
             <NTabs v-model:value="activeModuleKey" type="segment">
               <NTabPane v-for="item in activeReview.modules" :key="item.key" :name="item.key" :tab="item.title">
                 <div class="module-card">
@@ -146,6 +164,38 @@ function notify(action: string) {
               </NGi>
             </NGrid>
 
+            <NGrid cols="1 xl:2" responsive="screen" :x-gap="16" :y-gap="16">
+              <NGi>
+                <div class="detail-block">
+                  <div class="text-15px text-[#111827] font-600">复审操作单</div>
+                  <NForm class="mt-12px" label-placement="top">
+                    <NFormItem label="处理动作">
+                      <NRadioGroup v-model:value="decision" name="decision">
+                        <NSpace vertical>
+                          <NRadio v-for="item in reviewDecisionGuides" :key="item.id" :value="item.id">
+                            {{ item.label }}
+                          </NRadio>
+                        </NSpace>
+                      </NRadioGroup>
+                    </NFormItem>
+                    <NFormItem label="处理说明">
+                      <NInput v-model:value="decisionNote" type="textarea" :autosize="{ minRows: 4, maxRows: 6 }" />
+                    </NFormItem>
+                  </NForm>
+                </div>
+              </NGi>
+              <NGi>
+                <div class="detail-block">
+                  <div class="text-15px text-[#111827] font-600">当前建议</div>
+                  <p class="mt-12px text-13px text-[#475569] leading-22px">{{ activeDecisionGuide.desc }}</p>
+                  <div class="mt-10px text-13px text-[#334155]">{{ activeDecisionGuide.action }}</div>
+                  <div class="mt-10px rounded-16px bg-white px-14px py-12px text-12px text-[#64748b] leading-20px">
+                    现场 demo 时，可以先展示机审结论，再切换不同处理动作，说明“通过 / 重生成 / 退回修改”对应的业务差异。
+                  </div>
+                </div>
+              </NGi>
+            </NGrid>
+
             <div class="detail-block">
               <div class="text-15px text-[#111827] font-600">审核历史</div>
               <NTimeline class="mt-12px">
@@ -173,7 +223,8 @@ function notify(action: string) {
 .review-summary,
 .module-card,
 .detail-block,
-.frame-row {
+.frame-row,
+.decision-card {
   border-radius: 18px;
   border: 1px solid rgb(148 163 184 / 0.16);
   background: #fff;
@@ -192,13 +243,20 @@ function notify(action: string) {
 
 .review-summary,
 .module-card,
-.detail-block {
+.detail-block,
+.decision-card {
   padding: 16px;
   background: #f8fafc;
 }
 
 .frame-row {
   padding: 12px;
+}
+
+.decision-matrix {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 .module-points {

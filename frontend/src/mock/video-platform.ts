@@ -171,26 +171,134 @@ export interface ReviewRule {
   updatedAt: string;
 }
 
+export interface InputAuditCheckpoint {
+  id: string;
+  title: string;
+  type: 'safe' | 'warn' | 'block';
+  summary: string;
+  detail: string;
+}
+
+export interface QueueInsight {
+  label: string;
+  value: string;
+  desc: string;
+  tone: 'default' | 'info' | 'success' | 'warning' | 'error';
+}
+
+export interface TaskSceneRuntime {
+  id: string;
+  title: string;
+  duration: string;
+  status: 'ready' | 'rendering' | 'voice' | 'review' | 'completed';
+  visual: string;
+  narration: string;
+  updatedAt: string;
+  operator: string;
+  actionHint: string;
+}
+
+export interface TaskActivityLog {
+  time: string;
+  title: string;
+  desc: string;
+  actor: string;
+}
+
+export interface ReviewDecisionGuide {
+  id: string;
+  label: string;
+  when: string;
+  action: string;
+  desc: string;
+}
+
+export interface RuleSimulationCase {
+  id: string;
+  title: string;
+  summary: string;
+  hitRuleIds: string[];
+  recommendation: string;
+  riskScore: number;
+}
+
+export interface KnowledgeTagGroup {
+  id: string;
+  name: string;
+  scope: '平台' | '学校';
+  owner: string;
+  description: string;
+  tags: string[];
+}
+
+export interface WatermarkPreset {
+  id: string;
+  schoolId: string;
+  name: string;
+  mode: string;
+  position: string;
+  opacity: string;
+  sceneUsage: string;
+  desc: string;
+}
+
+export interface TechArchitectureLayer {
+  id: string;
+  title: string;
+  summary: string;
+  items: string[];
+}
+
+export interface DeliveryPhase {
+  id: string;
+  phase: string;
+  goal: string;
+  scope: string;
+  milestone: string;
+  riskControl: string;
+}
+
+export interface DemoAccountCard {
+  key: string;
+  label: string;
+  loginName: string;
+  school: string;
+  focusRoute: string;
+  highlights: string[];
+}
+
+export interface LibraryAuditSnapshot {
+  posterTitle: string;
+  classroomUse: string;
+  retention: string;
+  restrictions: string[];
+  auditTrail: Array<{
+    time: string;
+    title: string;
+    desc: string;
+  }>;
+}
+
 export const platformMetrics: PlatformMetric[] = [
   {
     label: '今日待处理任务',
-    value: '12',
-    desc: '覆盖教师发起、学生代审和输出复审'
+    value: '18',
+    desc: '覆盖教师发起、学生代审、脚本退回和输出复审。'
   },
   {
     label: '教师剩余配额',
     value: '6 / 10',
-    desc: '每日上限可按角色和学校策略配置'
+    desc: '角色配额可按学校和学段策略独立配置。'
   },
   {
     label: '当前排队峰值',
     value: '200 并发',
-    desc: '高峰期进入排队并展示预计等待时间'
+    desc: '公开课高峰启用排队并展示预计等待时间。'
   },
   {
     label: '学校定制资产',
-    value: '8 项',
-    desc: '校徽、校训、校园背景和本校红色资源标签'
+    value: '15 项',
+    desc: '包含校徽、校训、校园背景与本校知识点标签。'
   }
 ];
 
@@ -198,32 +306,32 @@ export const workflowStages: WorkflowStage[] = [
   {
     title: '自然语言发起',
     owner: '教师 / 学生',
-    desc: '输入主题、时长、年级、知识点标签和学校定制参数，并先经过输入安全审核。'
+    desc: '输入主题、年级、时长、标签与学校策略，首先经过输入安全审核。'
   },
   {
     title: '教师强制审稿',
     owner: '教师',
-    desc: '系统自动生成结构化脚本，教师必须逐镜确认旁白和画面描述，未确认前不得进入素材生成。'
+    desc: '系统生成结构化脚本，教师必须逐镜确认旁白和画面描述。'
   },
   {
-    title: '自动批量生成',
+    title: '批量生成素材',
     owner: '系统',
-    desc: '按确认后的分镜批量生成画面、配音、字幕和背景音乐，并将任务纳入排队体系。'
+    desc: '按确认后的分镜批量生成画面、配音、字幕和背景音乐，并纳入队列。'
   },
   {
     title: '单镜头微调',
     owner: '教师',
-    desc: '修改旁白仅重合成配音，修改画面描述则重绘画面并重新合成配音。'
+    desc: '只改旁白则重配音；改画面描述则重绘画面并同步重配音。'
   },
   {
     title: '输出安全复审',
     owner: '系统 + 教师',
-    desc: '0.9 自动拦截，0.6~0.9 强制人工复审，真实历史人物全量进入教师复核。'
+    desc: '0.9 自动拦截，0.6~0.9 强制人工复审，历史人物全量进入教师复核。'
   },
   {
     title: '视频入库与审计',
     owner: '教师 / 学校',
-    desc: '通过的视频进入教师视频库，学生作品经教师确认后才对学生可见，并保留完整审计日志。'
+    desc: '通过的视频进入视频库，学生作品经教师确认后才对学生可见。'
   }
 ];
 
@@ -233,7 +341,7 @@ export const templatePresets: TemplatePreset[] = [
     category: '课堂导入',
     title: '诚信主题故事模板',
     tone: '卡通叙事',
-    description: '适合 3 分钟以内课堂导入，默认包含故事、总结和行动倡议三段式结构。',
+    description: '适合 3 分钟内课堂导入，默认包含故事、总结和行动倡议三段式结构。',
     scenes: 6
   },
   {
@@ -241,7 +349,7 @@ export const templatePresets: TemplatePreset[] = [
     category: '历史人物',
     title: '历史人物精神主题',
     tone: '庄重叙事',
-    description: '适合雷锋、周恩来等人物主题，自动触发历史人物强制复审提醒。',
+    description: '适合雷锋、周恩来、钱学森等主题，自动触发历史人物复审提醒。',
     scenes: 8
   },
   {
@@ -257,7 +365,7 @@ export const templatePresets: TemplatePreset[] = [
     category: '学生作业',
     title: '学生课后创作模板',
     tone: '轻叙事',
-    description: '默认走学生发起、教师代审、教师确认可见的审核链路。',
+    description: '默认走学生发起、教师代审、教师确认后学生可见的审核链路。',
     scenes: 5
   }
 ];
@@ -385,6 +493,33 @@ export const gradePresets: GradePreset[] = [
 
 export const knowledgeTags = ['诚信', '校园文明', '责任意识', '规则意识', '红色资源', '嘉兴红船', '井冈山精神'];
 
+export const knowledgeTagGroups: KnowledgeTagGroup[] = [
+  {
+    id: 'tag-platform-outline',
+    name: '平台通用大纲标签',
+    scope: '平台',
+    owner: '平台运营',
+    description: '来自国家中小学智慧教育平台与课程大纲整理，用于平台通用提示词注入。',
+    tags: ['诚信', '责任意识', '规则意识', '法治观念', '集体荣誉']
+  },
+  {
+    id: 'tag-red-resource',
+    name: '红色资源专题',
+    scope: '平台',
+    owner: '平台运营',
+    description: '用于历史人物、红色资源和革命精神类主题。',
+    tags: ['红色资源', '嘉兴红船', '井冈山精神', '雷锋精神', '科技报国']
+  },
+  {
+    id: 'tag-school-local',
+    name: '本校自定义标签',
+    scope: '学校',
+    owner: '学校管理员 / 教师',
+    description: '学校侧可增补校本德育项目、校史馆内容和本地化资源。',
+    tags: ['校园文明', '图书角公约', '班级值日', '校园成长故事']
+  }
+];
+
 export const scriptReviewScenes: StoryboardScene[] = [
   {
     id: 'scene-1',
@@ -509,8 +644,217 @@ export const videoTasks: VideoTask[] = [
       { name: '微调处理', status: 'todo' },
       { name: '输出审核', status: 'todo' }
     ]
+  },
+  {
+    id: 'task-105',
+    schoolId: 'cdwgy',
+    title: '校园礼仪双语导入视频',
+    templateId: 'tpl-campus',
+    creatorRole: '教师',
+    owner: '国际课程组',
+    gradeBand: '初中 7-9 年级',
+    status: 'draft',
+    progress: 34,
+    updatedAt: '今天 10:05',
+    queue: '脚本等待教师确认',
+    quota: '教师今日已用 2 / 10 次',
+    output: '720p / MP4 / 2 分 12 秒',
+    riskSummary: '学校品牌素材已注入，等待教师确认是否启用校园背景。',
+    summary: '用于班会导入，演示学校定制素材和校园背景智能融入能力。',
+    steps: [
+      { name: '输入审核', status: 'done' },
+      { name: '脚本确认', status: 'active' },
+      { name: '素材生成', status: 'todo' },
+      { name: '微调处理', status: 'todo' },
+      { name: '输出审核', status: 'todo' }
+    ]
   }
 ];
+
+export const taskQueueInsights: QueueInsight[] = [
+  {
+    label: '排队中任务',
+    value: '7',
+    desc: '包含生成中和等待复审两类耗时节点。',
+    tone: 'info'
+  },
+  {
+    label: '平均等待时间',
+    value: '02:40',
+    desc: '公开课周自动开启排队位置和预计等待时长提示。',
+    tone: 'warning'
+  },
+  {
+    label: '今日重生成次数',
+    value: '9 次',
+    desc: '其中 6 次仅重配音，3 次重绘画面并重配音。',
+    tone: 'success'
+  },
+  {
+    label: '输入拦截',
+    value: '2 条',
+    desc: '全部进入教师可见的违规日志链路。',
+    tone: 'error'
+  }
+];
+
+export const taskSceneRuntimes: Record<string, TaskSceneRuntime[]> = {
+  'task-101': [
+    {
+      id: 'ts-101-1',
+      title: '镜头 1 · 借书角发现问题',
+      duration: '20 秒',
+      status: 'completed',
+      visual: '教室借书角暖色卡通场景，突出借书卡与归还动作。',
+      narration: '小文在借书角发现登记信息和实际情况不一致，诚信问题被自然抛出。',
+      updatedAt: '今天 14:08',
+      operator: '系统首轮生成',
+      actionHint: '已完成，无需调整。'
+    },
+    {
+      id: 'ts-101-2',
+      title: '镜头 2 · 主动承认错误',
+      duration: '35 秒',
+      status: 'voice',
+      visual: '学生围绕主人公形成半圆构图，老师在背景中鼓励表达。',
+      narration: '主人公主动承认忘记登记归还图书，班级氛围从怀疑转向理解。',
+      updatedAt: '今天 14:20',
+      operator: '李老师修改旁白后触发',
+      actionHint: '如果继续改旁白，建议只重配音。'
+    },
+    {
+      id: 'ts-101-3',
+      title: '镜头 3 · 老师总结升华',
+      duration: '25 秒',
+      status: 'rendering',
+      visual: '黑板前总结诚信概念，背景带校徽和班级公约。',
+      narration: '老师引导学生把诚信落到“今天的一件小事”上。',
+      updatedAt: '今天 14:31',
+      operator: '系统生成中',
+      actionHint: '如需替换班级公约文案，可改画面描述后重绘。'
+    }
+  ],
+  'task-102': [
+    {
+      id: 'ts-102-1',
+      title: '镜头 1 · 人物出场',
+      duration: '22 秒',
+      status: 'completed',
+      visual: '写实插画风格呈现钱学森人物形象与科研背景。',
+      narration: '钱学森回国后投身祖国航天事业，为科技强国奠定重要基础。',
+      updatedAt: '今天 10:40',
+      operator: '系统首轮生成',
+      actionHint: '无需改动。'
+    },
+    {
+      id: 'ts-102-2',
+      title: '镜头 2 · 科技报国升华',
+      duration: '26 秒',
+      status: 'review',
+      visual: '历史画面与现代校园实验室交叉剪影。',
+      narration: '科技报国不仅是历史故事，更是当代青少年的精神坐标。',
+      updatedAt: '今天 11:18',
+      operator: '等待教师复审',
+      actionHint: '建议修订“世界顶尖”表述后再通过。'
+    }
+  ],
+  'task-103': [
+    {
+      id: 'ts-103-1',
+      title: '镜头 1 · 校园问候',
+      duration: '18 秒',
+      status: 'completed',
+      visual: '校门口早晨问好场景，低年级卡通风。',
+      narration: '同学们互相问好，班级的一天从礼貌开始。',
+      updatedAt: '昨天 16:44',
+      operator: '教师代审通过',
+      actionHint: '已发布。'
+    }
+  ],
+  'task-104': [
+    {
+      id: 'ts-104-1',
+      title: '输入阶段拦截',
+      duration: '-',
+      status: 'review',
+      visual: '未生成画面。',
+      narration: '未通过输入审核，不进入脚本生成阶段。',
+      updatedAt: '今天 09:10',
+      operator: '系统拦截',
+      actionHint: '需修改原始指令后重新提交。'
+    }
+  ],
+  'task-105': [
+    {
+      id: 'ts-105-1',
+      title: '镜头 1 · 校园礼仪场景',
+      duration: '24 秒',
+      status: 'ready',
+      visual: '校园门厅和教学楼场景，适配学校品牌主题色。',
+      narration: '礼仪不是口号，而是每天都能做到的尊重与秩序。',
+      updatedAt: '今天 09:58',
+      operator: '国际课程组初稿',
+      actionHint: '可先确认是否启用双语字幕。'
+    }
+  ]
+};
+
+export const taskActivityLogs: Record<string, TaskActivityLog[]> = {
+  'task-101': [
+    {
+      time: '14:02',
+      title: '输入审核通过',
+      desc: '系统完成主题、标签和学校素材策略的前置审核。',
+      actor: '系统'
+    },
+    {
+      time: '14:06',
+      title: '教师确认脚本',
+      desc: '李老师修改了第二镜头的旁白，并确认进入素材生成。',
+      actor: '教师'
+    },
+    {
+      time: '14:20',
+      title: '仅重配音',
+      desc: '第二镜头改旁白后，系统只触发配音重合成，没有重绘画面。',
+      actor: '系统'
+    },
+    {
+      time: '14:31',
+      title: '第三镜头重绘中',
+      desc: '教师补充了“班级公约”画面元素，系统正在重绘并同步重配音。',
+      actor: '系统'
+    }
+  ],
+  'task-102': [
+    {
+      time: '10:22',
+      title: '历史人物标签注入',
+      desc: '系统自动加入“真实历史人物需终审复核”的提示语。',
+      actor: '系统'
+    },
+    {
+      time: '11:08',
+      title: '输出机审完成',
+      desc: '视频整体安全，但因历史人物主题被送入教师复审。',
+      actor: '系统'
+    },
+    {
+      time: '11:20',
+      title: '等待完整看片',
+      desc: '教师需要看完整片并确认字幕修订建议。',
+      actor: '教师'
+    }
+  ],
+  'task-104': [
+    {
+      time: '09:08',
+      title: '输入违规拦截',
+      desc: '系统提示“内容违规，请修改后重试”，并写入教师可见日志。',
+      actor: '系统'
+    }
+  ]
+};
 
 export const reviewCases: ReviewCase[] = [
   {
@@ -519,7 +863,7 @@ export const reviewCases: ReviewCase[] = [
     taskId: 'task-102',
     title: '钱学森与科技报国',
     severity: '中',
-    school: '天府新区教师发展中心',
+    school: '成都市实验外国语学校',
     applicant: '王教研员',
     machine: '输出机审置信度 0.71，且命中真实历史人物规则，强制进入人工复审。',
     notes: '建议将“世界顶尖”修订为“作出重要贡献”，教师需观看完整视频后再决定是否通过。',
@@ -572,7 +916,7 @@ export const reviewCases: ReviewCase[] = [
     taskId: 'task-104',
     title: '学生违规指令待重提',
     severity: '高',
-    school: '实验小学五年级组',
+    school: '成都市泡桐树小学（天府校区）',
     applicant: '学生提交',
     machine: '输入审核直接拦截，判定为不适宜未成年人内容方向。',
     notes: '学生可修改后重新提交；若累计 3 次恶意违规，则限制使用 24 小时。',
@@ -609,6 +953,112 @@ export const reviewCases: ReviewCase[] = [
       { time: '09:08', title: '输入违规拦截', desc: '系统提示“内容违规，请修改后重试”。' },
       { time: '09:09', title: '教师可见记录', desc: '该条违规已经写入教师审核日志。' }
     ]
+  },
+  {
+    id: 'rv-3',
+    schoolId: 'cdsszx',
+    taskId: 'task-101',
+    title: '诚信主题 3 分钟课堂视频',
+    severity: '低',
+    school: '成都石室中学',
+    applicant: '李老师',
+    machine: '当前处于成片前机审阶段，暂无高风险命中。',
+    notes: '预计成片后可自动通过，若后续启用校园背景智能融入，需要再看一次画面一致性。',
+    tags: ['普通复核', '可自动通过'],
+    keyframes: [
+      { time: '00:04', label: '借书角镜头', note: '低龄友好' },
+      { time: '00:36', label: '主动承认错误', note: '教师建议保留' }
+    ],
+    subtitleSegments: [
+      { time: '00:12', text: '诚信就是说真话、做对事。', level: 'safe' },
+      { time: '00:35', text: '勇敢承认错误也是诚信的一部分。', level: 'safe' }
+    ],
+    modules: [
+      {
+        key: 'text',
+        title: '文本审校',
+        summary: '表达符合小学高段课程目标，鼓励行动倡议。',
+        points: ['故事清晰', '结尾有课堂追问', '没有超龄抽象词汇']
+      },
+      {
+        key: 'image',
+        title: '图像审校',
+        summary: '校园卡通画面一致性较好。',
+        points: ['角色统一', '场景安全', '校徽叠加正确']
+      },
+      {
+        key: 'video',
+        title: '视频关键帧',
+        summary: '节奏平稳，适合作为课堂导入。',
+        points: ['镜头衔接自然', '转场不过度炫技']
+      },
+      {
+        key: 'audio',
+        title: '音频与配音',
+        summary: '语速与年级匹配，配乐控制得当。',
+        points: ['220 字/分钟', '字幕同步正常']
+      }
+    ],
+    history: [
+      { time: '14:02', title: '输入审核通过', desc: '自然语言指令安全通过。' },
+      { time: '14:06', title: '教师确认脚本', desc: '允许进入批量生成阶段。' },
+      { time: '14:33', title: '成片前检查', desc: '系统判定大概率自动通过。' }
+    ]
+  }
+];
+
+export const reviewDecisionGuides: ReviewDecisionGuide[] = [
+  {
+    id: 'approve',
+    label: '教师通过',
+    when: '机审安全或仅有低风险提示时',
+    action: '视频直接进入教师视频库；若为学生作品，再同步学生可见状态。',
+    desc: '适用于普通课堂导入、校园文明等低风险场景。'
+  },
+  {
+    id: 'regen',
+    label: '要求重新生成',
+    when: '画面或字幕需要明显修订，但主题方向可保留时',
+    action: '系统保留原任务号并生成新版本，审计链路不断裂。',
+    desc: '适用于历史人物字幕措辞需要修正、校园背景素材要替换等情况。'
+  },
+  {
+    id: 'reject',
+    label: '退回修改',
+    when: '输入方向本身不合适，或学生需重新组织表达时',
+    action: '任务回到发起台，学生只能修改后重提，教师可看到退回原因。',
+    desc: '适用于输入审核拦截、年级表达明显不匹配等场景。'
+  }
+];
+
+export const inputAuditCheckpoints: InputAuditCheckpoint[] = [
+  {
+    id: 'input-1',
+    title: '未成年人保护',
+    type: 'safe',
+    summary: '禁止引导危险模仿、欺凌、极端表达和不适宜未成年人的剧情。',
+    detail: '前置审核优先拦截问题输入，减少无效算力浪费。'
+  },
+  {
+    id: 'input-2',
+    title: '真人形象禁令',
+    type: 'warn',
+    summary: '允许卡通或插画风历史人物，不允许真实学生、教师照片替换。',
+    detail: '教师若上传校园素材，只能作为背景或品牌资产，不能用于真人换脸。'
+  },
+  {
+    id: 'input-3',
+    title: '学校品牌策略',
+    type: 'safe',
+    summary: '校徽、校训和校园背景按学校隔离注入，不跨校复用。',
+    detail: '切换学校后，系统名称、主题色和素材注入策略同步变化。'
+  },
+  {
+    id: 'input-4',
+    title: '高风险表达拦截',
+    type: 'block',
+    summary: '命中敏感表达时直接中断流程，并写入教师可见日志。',
+    detail: '学生累计 3 次恶意违规后可被限制 24 小时。'
   }
 ];
 
@@ -662,6 +1112,49 @@ export const schoolAssets: SchoolAsset[] = [
     usage: '已复用 9 次',
     description: '用于学校品牌主题展示和片尾校训叠加，可与学校标识一并配置。',
     access: '本校隔离可用'
+  },
+  {
+    id: 'asset-6',
+    schoolId: 'cdwgy',
+    type: '校园背景图',
+    title: '国际交流长廊',
+    source: '学校管理员上传',
+    usage: '已复用 5 次',
+    description: '用于礼仪主题和校园故事主题的默认背景。',
+    access: '本校隔离可用'
+  }
+];
+
+export const schoolWatermarkPresets: WatermarkPreset[] = [
+  {
+    id: 'wm-1',
+    schoolId: 'cdsszx',
+    name: '片头片尾固定叠加',
+    mode: '固定叠加',
+    position: '左下角 + 片尾居中',
+    opacity: '72%',
+    sceneUsage: '课堂导入、教师备课',
+    desc: '适合正式课堂视频，强调学校品牌和课程归属。'
+  },
+  {
+    id: 'wm-2',
+    schoolId: 'cdwgy',
+    name: '品牌主题轻水印',
+    mode: '固定叠加',
+    position: '右上角',
+    opacity: '54%',
+    sceneUsage: '学生作业展示',
+    desc: '保留品牌识别，同时不干扰字幕和主要画面。'
+  },
+  {
+    id: 'wm-3',
+    schoolId: 'pxtx',
+    name: '校园背景智能融入',
+    mode: '智能融入',
+    position: '背景内嵌',
+    opacity: '自适应',
+    sceneUsage: '校园故事、班级活动',
+    desc: '把校园场景作为故事背景融入，不单独叠加硬水印。'
   }
 ];
 
@@ -698,8 +1191,63 @@ export const publishItems: PublishItem[] = [
     visibility: '教师草稿箱',
     operator: '李老师',
     updatedAt: '今天 14:35'
+  },
+  {
+    id: 'pub-4',
+    schoolId: 'cdwgy',
+    taskId: 'task-105',
+    title: '校园礼仪双语导入视频',
+    status: 'draft',
+    version: 'v0.3',
+    visibility: '待脚本确认',
+    operator: '国际课程组',
+    updatedAt: '今天 10:05'
   }
 ];
+
+export const libraryAuditSnapshots: Record<string, LibraryAuditSnapshot> = {
+  'task-103': {
+    posterTitle: '校园文明一分钟短片',
+    classroomUse: '班会导入 / 学生自评 / 家校沟通',
+    retention: '默认保存 30 天，教师可手动导出',
+    restrictions: ['仅限校内教学使用', '禁止一键分享到公共社交平台', '学生仅能看到教师确认版本'],
+    auditTrail: [
+      {
+        time: '昨天 16:48',
+        title: '教师完成脚本确认',
+        desc: '学生提交后由班主任完成代审。'
+      },
+      {
+        time: '昨天 17:38',
+        title: '终审通过',
+        desc: '视频进入教师视频库。'
+      },
+      {
+        time: '今天 09:20',
+        title: '同步学生可见',
+        desc: '学生端可以观看和下载该作品。'
+      }
+    ]
+  },
+  'task-102': {
+    posterTitle: '钱学森与科技报国',
+    classroomUse: '历史人物主题班会 / 科技报国主题活动',
+    retention: '复审完成后才写入正式视频库',
+    restrictions: ['需教师完整看片', '涉及历史人物的版本必须保留审计链路'],
+    auditTrail: [
+      {
+        time: '今天 11:08',
+        title: '机审完成',
+        desc: '命中历史人物复审规则。'
+      },
+      {
+        time: '今天 11:26',
+        title: '教师复审提醒',
+        desc: '等待教师完整看片和结论。'
+      }
+    ]
+  }
+};
 
 export const roleProfiles: RoleProfile[] = [
   {
@@ -729,6 +1277,41 @@ export const roleProfiles: RoleProfile[] = [
     dailyLimit: '不限',
     desc: '负责全局审核阈值、知识点标签库和高风险内容处理。',
     capabilities: ['维护思政知识点标签库', '审核高风险内容', '管理全局模型阈值']
+  }
+];
+
+export const demoAccounts: DemoAccountCard[] = [
+  {
+    key: 'teacher',
+    label: '教师视角',
+    loginName: 'teacher',
+    school: '成都石室中学',
+    focusRoute: '/workflow/workspace',
+    highlights: ['发起任务', '逐镜审稿', '微调镜头', '终审放行']
+  },
+  {
+    key: 'student',
+    label: '学生视角',
+    loginName: 'student',
+    school: '成都市泡桐树小学（天府校区）',
+    focusRoute: '/workflow/tasks',
+    highlights: ['提交作业', '查看可见作品', '被拦截后重提']
+  },
+  {
+    key: 'admin',
+    label: '学校管理员视角',
+    loginName: 'admin',
+    school: '成都外国语学校',
+    focusRoute: '/school/assets',
+    highlights: ['维护校徽校训', '配置水印', '查看学校规则']
+  },
+  {
+    key: 'ops',
+    label: '平台运营视角',
+    loginName: 'operator',
+    school: '成都市实验外国语学校',
+    focusRoute: '/governance/review',
+    highlights: ['跨校巡检', '调规则权重', '看全局技术与成本']
   }
 ];
 
@@ -822,6 +1405,101 @@ export const reviewRules: ReviewRule[] = [
     hitHint: '命中后在脚本审核台展示“适龄表达”提醒。',
     owner: '学校管理员',
     updatedAt: '今天 11:06'
+  }
+];
+
+export const ruleSimulationCases: RuleSimulationCase[] = [
+  {
+    id: 'sim-1',
+    title: '学生输入含敏感表达',
+    summary: '用于演示前置审核在输入阶段直接拦截，不浪费后续算力。',
+    hitRuleIds: ['rule-001'],
+    recommendation: '直接拦截并要求修改后重试。',
+    riskScore: 96
+  },
+  {
+    id: 'sim-2',
+    title: '历史人物主题成片',
+    summary: '用于演示“机审安全 + 历史人物强制复审”的业务逻辑。',
+    hitRuleIds: ['rule-002'],
+    recommendation: '进入教师完整看片复审。',
+    riskScore: 74
+  },
+  {
+    id: 'sim-3',
+    title: '低龄脚本词汇偏难',
+    summary: '用于演示学校侧规则只提醒不直接阻断流程。',
+    hitRuleIds: ['rule-004'],
+    recommendation: '提示教师调整用词难度后继续。',
+    riskScore: 28
+  },
+  {
+    id: 'sim-4',
+    title: '发布前缺少校徽',
+    summary: '用于演示学校品牌策略不满足时，视频只能保存草稿。',
+    hitRuleIds: ['rule-003'],
+    recommendation: '保留草稿，不允许直接发布。',
+    riskScore: 42
+  }
+];
+
+export const techArchitectureLayers: TechArchitectureLayer[] = [
+  {
+    id: 'layer-api',
+    title: '统一 API 服务层',
+    summary: '承载登录、任务发起、脚本编辑、审核结果查询与管理后台接口。',
+    items: ['FastAPI', '角色权限 + 数据范围控制', '统一接入网关演进空间']
+  },
+  {
+    id: 'layer-workflow',
+    title: '工作流编排中心',
+    summary: '管理视频任务状态机、子任务拆分、失败重试和排队调度。',
+    items: ['Redis 队列', 'Celery / ARQ', 'pending / running / waiting_review / blocked / completed']
+  },
+  {
+    id: 'layer-generator',
+    title: '生成适配层',
+    summary: '统一封装脚本生成、Seedance 2.0、TTS、字幕与 FFmpeg 合成。',
+    items: ['generate_storyboard_assets', 'regenerate_scene_visual', 'synthesize_voice', 'compose_video']
+  },
+  {
+    id: 'layer-review',
+    title: '审核中台',
+    summary: '封装腾讯云 TMS / CI、自定义规则、风险分级和人工复审流转。',
+    items: ['前置输入审核', '后置视频审核', '规则版本管理', '命中明细留存']
+  },
+  {
+    id: 'layer-assets',
+    title: '资产中心',
+    summary: '管理学校素材、模板、标签库、输出视频和审计附件。',
+    items: ['COS / MinIO', '学校隔离资产', '视频库与审计链路']
+  }
+];
+
+export const deliveryPhases: DeliveryPhase[] = [
+  {
+    id: 'phase-1',
+    phase: 'MVP 交付',
+    goal: '先把教师主流程与学生差异流程跑通，确保可 demo、可验收、可上线试点。',
+    scope: 'PC Web 端、单体增强型后端、前置 + 后置审核闭环。',
+    milestone: '10 分钟内完成 3 分钟课堂视频的发起、审稿、生成、复审和入库演示。',
+    riskControl: '先用任务队列和规则中台保护稳定性，避免一开始追求复杂分布式。'
+  },
+  {
+    id: 'phase-2',
+    phase: '学校接入扩展',
+    goal: '支持更多学校接入与多学校品牌配置复用。',
+    scope: '学校素材库、标签库、默认参数、校级规则独立维护。',
+    milestone: '能在同一套平台下快速切换多学校主题和资产。 ',
+    riskControl: '坚持学校资源隔离，避免素材和日志串校。'
+  },
+  {
+    id: 'phase-3',
+    phase: '分布式演进',
+    goal: '应对更高并发和更多工作流节点。',
+    scope: '统一接入网关、服务拆分、K8s 部署、可观测性增强。',
+    milestone: '生成编排、审核中台、权限中心可以独立扩容。',
+    riskControl: '先保持接口稳定，再逐步拆服务，避免 MVP 期过度设计。'
   }
 ];
 

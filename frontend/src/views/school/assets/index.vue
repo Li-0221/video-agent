@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useSchoolStore } from '@/store/modules/school';
-import { schoolAssets, schoolPresets } from '@/mock/video-platform';
+import { knowledgeTagGroups, schoolAssets, schoolPresets, schoolWatermarkPresets } from '@/mock/video-platform';
 
 const schoolStore = useSchoolStore();
 
 const visibleAssets = computed(() => schoolAssets.filter(item => item.schoolId === schoolStore.activeSchool.id));
+const visibleWatermarks = computed(() =>
+  schoolWatermarkPresets.filter(item => item.schoolId === schoolStore.activeSchool.id)
+);
+const schoolTagGroups = computed(() => knowledgeTagGroups.filter(item => item.scope === '学校'));
 
 function notify(action: string) {
   window.$message?.success(`${action} 已保存到学校级 mock 配置。`);
@@ -30,6 +34,46 @@ function notify(action: string) {
         </div>
       </div>
     </NCard>
+
+    <NGrid cols="1 xl:2" responsive="screen" :x-gap="16" :y-gap="16">
+      <NGi>
+        <NCard title="学校品牌总览" :bordered="false" class="card-wrapper">
+          <div class="brand-panel">
+            <div class="brand-panel__meta">
+              <div class="text-12px text-[#64748b] tracking-[0.18em] uppercase">School Identity</div>
+              <h3 class="mt-8px text-24px text-[#111827] font-700">{{ schoolStore.activeSchool.systemName }}</h3>
+              <p class="mt-10px text-13px text-[#475569] leading-22px">{{ schoolStore.activeSchool.slogan }}</p>
+            </div>
+            <div class="brand-chip-wrap">
+              <span class="brand-chip" :style="{ backgroundColor: schoolStore.activeSchool.theme.primary }">主色</span>
+              <span class="brand-chip" :style="{ backgroundColor: schoolStore.activeSchool.theme.secondary }">
+                辅色
+              </span>
+              <span
+                class="brand-chip brand-chip--dark"
+                :style="{ backgroundColor: schoolStore.activeSchool.theme.accent }"
+              >
+                强调色
+              </span>
+            </div>
+          </div>
+        </NCard>
+      </NGi>
+
+      <NGi>
+        <NCard title="学校预设策略" :bordered="false" class="card-wrapper">
+          <div class="grid gap-12px">
+            <div v-for="item in schoolPresets" :key="item.id" class="asset-card">
+              <div class="flex items-center justify-between gap-10px">
+                <div class="text-15px text-[#111827] font-600">{{ item.name }}</div>
+                <NTag size="small" :bordered="false">{{ item.watermarkMode }}</NTag>
+              </div>
+              <p class="mt-8px text-13px text-[#475569] leading-22px">{{ item.desc }}</p>
+            </div>
+          </div>
+        </NCard>
+      </NGi>
+    </NGrid>
 
     <NGrid cols="1 xl:2" responsive="screen" :x-gap="16" :y-gap="16">
       <NGi>
@@ -63,25 +107,36 @@ function notify(action: string) {
 
       <NGi>
         <div class="flex-col-stretch gap-16px">
-          <NCard title="学校预设策略" :bordered="false" class="card-wrapper">
+          <NCard title="水印与校园背景方案" :bordered="false" class="card-wrapper">
             <div class="grid gap-12px">
-              <div v-for="item in schoolPresets" :key="item.id" class="asset-card">
+              <div v-for="item in visibleWatermarks" :key="item.id" class="asset-card">
                 <div class="flex items-center justify-between gap-10px">
                   <div class="text-15px text-[#111827] font-600">{{ item.name }}</div>
-                  <NTag size="small" :bordered="false">{{ item.watermarkMode }}</NTag>
+                  <NTag size="small" :bordered="false" type="success">{{ item.mode }}</NTag>
+                </div>
+                <div class="grid mt-10px gap-6px text-12px text-[#64748b]">
+                  <div>位置：{{ item.position }}</div>
+                  <div>透明度：{{ item.opacity }}</div>
+                  <div>适用场景：{{ item.sceneUsage }}</div>
                 </div>
                 <p class="mt-8px text-13px text-[#475569] leading-22px">{{ item.desc }}</p>
               </div>
             </div>
           </NCard>
 
-          <NCard title="学校隔离规则" :bordered="false" class="card-wrapper">
-            <ul class="asset-list">
-              <li>校徽、校训、校园背景和本校红色资源标签均按学校 ID 进行资源隔离。</li>
-              <li>教师只能看到本校素材和由本校教师新增的自定义标签。</li>
-              <li>平台运营仅维护公共课程大纲标签，不直接覆盖学校个性化素材。</li>
-              <li>学生不直接接触资产库，只能透过教师或学校管理员配置后的结果使用。</li>
-            </ul>
+          <NCard title="学校自定义标签" :bordered="false" class="card-wrapper">
+            <div class="grid gap-12px">
+              <div v-for="group in schoolTagGroups" :key="group.id" class="asset-card">
+                <div class="flex items-center justify-between gap-10px">
+                  <div class="text-15px text-[#111827] font-600">{{ group.name }}</div>
+                  <NTag size="small" :bordered="false" type="warning">{{ group.owner }}</NTag>
+                </div>
+                <p class="mt-8px text-13px text-[#475569] leading-22px">{{ group.description }}</p>
+                <div class="mt-10px flex flex-wrap gap-8px">
+                  <span v-for="tag in group.tags" :key="tag" class="tag-pill">{{ tag }}</span>
+                </div>
+              </div>
+            </div>
           </NCard>
         </div>
       </NGi>
@@ -90,14 +145,40 @@ function notify(action: string) {
 </template>
 
 <style scoped>
+.brand-panel,
 .theme-summary {
   display: grid;
   gap: 12px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   padding: 16px;
   border-radius: 18px;
   background: #f8fafc;
   border: 1px solid rgb(148 163 184 / 0.16);
+}
+
+.brand-chip-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.brand-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: 8px 14px;
+  border-radius: 9999px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.brand-chip--dark {
+  color: #111827;
+}
+
+.theme-summary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .theme-summary__label {
@@ -119,13 +200,15 @@ function notify(action: string) {
   background: #fff;
 }
 
-.asset-list {
-  margin: 0;
-  padding-left: 18px;
-  display: grid;
-  gap: 10px;
-  color: #475569;
-  font-size: 13px;
-  line-height: 1.8;
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgb(148 163 184 / 0.18);
 }
 </style>

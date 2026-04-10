@@ -40,21 +40,27 @@ const activeModule = computed(() => moduleMap[props.module || 'pwd-login']);
 const bgThemeColor = computed(() =>
   themeStore.darkMode ? mixColor(themeStore.themeColor, '#000000', 0.5) : themeStore.themeColor
 );
+
+const loginHighlights = computed(() => ['教师强制审稿', '学生提交后代审', '学校品牌素材隔离', '规则中台与复审']);
 </script>
 
 <template>
-  <div class="relative size-full flex overflow-hidden bg-white dark:bg-[#121212]">
+  <div class="login-shell relative size-full flex overflow-hidden bg-white dark:bg-[#121212]">
     <!-- Left Side: Brand Area (Hidden on mobile) -->
-    <div class="relative hidden h-full w-1/2 flex-col items-center justify-center overflow-hidden md:flex">
+    <div
+      class="login-brand-panel relative hidden h-full w-1/2 flex-col items-center justify-center overflow-hidden md:flex"
+    >
       <!-- Gradient Overlay -->
       <div class="absolute inset-0 z-10 from-primary/90 to-primary/70 bg-gradient-to-br"></div>
       <!-- Wave Background -->
       <WaveBg :theme-color="bgThemeColor" class="absolute inset-0 z-0" />
 
       <!-- Content -->
-      <div class="relative z-20 flex flex-col items-center gap-6 p-10 text-white">
+      <div class="login-brand-content relative z-20 flex flex-col items-center gap-6 p-10 text-white">
         <!-- Logo Wrapper with glass effect -->
-        <div class="size-120px flex-center border border-white/20 rounded-3xl bg-white/20 shadow-xl backdrop-blur-sm">
+        <div
+          class="login-brand-logo size-120px flex-center border border-white/20 rounded-3xl bg-white/20 shadow-xl backdrop-blur-sm"
+        >
           <SystemLogo class="text-64px text-white" />
         </div>
 
@@ -66,11 +72,15 @@ const bgThemeColor = computed(() =>
             {{ schoolStore.activeSchool.slogan }}，覆盖发起、审稿、生成、复审和学校定制。
           </p>
         </div>
+
+        <div class="login-highlight-grid">
+          <div v-for="item in loginHighlights" :key="item" class="login-highlight-chip">{{ item }}</div>
+        </div>
       </div>
     </div>
 
     <!-- Right Side: Login Form -->
-    <div class="relative h-full flex flex-col flex-1 bg-white dark:bg-[#18181c]">
+    <div class="login-form-panel relative h-full flex flex-col flex-1 bg-white dark:bg-[#18181c]">
       <!-- Header Utility (Top Right) -->
       <header class="absolute right-0 top-0 z-50 flex items-center gap-4 p-6">
         <ThemeSchemaSwitch
@@ -89,7 +99,7 @@ const bgThemeColor = computed(() =>
 
       <!-- Main Content Center -->
       <div class="flex-center flex-1 overflow-y-auto">
-        <div class="max-w-420px w-full px-8 py-12">
+        <div class="login-form-surface max-w-460px w-full px-8 py-12">
           <!-- Mobile Logo (Hidden on Desktop) -->
           <div class="mb-10 flex flex-col items-center gap-4 md:hidden">
             <SystemLogo class="text-48px text-primary" />
@@ -106,6 +116,17 @@ const bgThemeColor = computed(() =>
             </p>
           </div>
 
+          <div class="login-insight-strip">
+            <div class="login-insight-strip__item">
+              <span class="login-insight-strip__label">当前学校</span>
+              <strong>{{ schoolStore.activeSchool.shortName }}</strong>
+            </div>
+            <div class="login-insight-strip__item">
+              <span class="login-insight-strip__label">演示重点</span>
+              <strong>多角色工作流</strong>
+            </div>
+          </div>
+
           <!-- Transition Wrapper for Form -->
           <div class="login-form-wrapper w-full">
             <Transition :name="themeStore.page.animateMode" mode="out-in" appear>
@@ -118,4 +139,109 @@ const bgThemeColor = computed(() =>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.login-shell::before {
+  content: '';
+  position: absolute;
+  inset: 20px;
+  border-radius: 36px;
+  background:
+    radial-gradient(circle at top left, rgb(255 255 255 / 0.78), transparent 18%),
+    linear-gradient(135deg, rgb(255 255 255 / 0.42), transparent 36%);
+  pointer-events: none;
+}
+
+.login-brand-panel::after {
+  content: '';
+  position: absolute;
+  inset: auto -120px -120px auto;
+  width: 320px;
+  height: 320px;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.16);
+  filter: blur(8px);
+}
+
+.login-brand-content {
+  animation: brand-float-in 0.8s ease both;
+}
+
+.login-brand-logo {
+  box-shadow:
+    0 16px 40px rgb(15 23 42 / 0.18),
+    inset 0 1px 0 rgb(255 255 255 / 0.24);
+}
+
+.login-highlight-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 620px;
+}
+
+.login-highlight-chip {
+  padding: 8px 14px;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.16);
+  border: 1px solid rgb(255 255 255 / 0.18);
+  backdrop-filter: blur(10px);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.login-form-panel {
+  background:
+    radial-gradient(circle at top, rgb(191 219 254 / 0.16), transparent 28%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.88) 0%, rgb(248 250 252 / 0.96) 100%);
+}
+
+.login-form-surface {
+  position: relative;
+}
+
+.login-insight-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 12px;
+  border-radius: 20px;
+  border: 1px solid rgb(148 163 184 / 0.14);
+  background: rgb(255 255 255 / 0.72);
+  box-shadow: 0 16px 32px rgb(15 23 42 / 0.06);
+}
+
+.login-insight-strip__item {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgb(248 250 252 / 0.88);
+}
+
+.login-insight-strip__item strong {
+  color: #111827;
+  font-size: 14px;
+}
+
+.login-insight-strip__label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+@keyframes brand-float-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+</style>

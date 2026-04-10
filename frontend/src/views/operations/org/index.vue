@@ -3,19 +3,19 @@ import { computed } from 'vue';
 import { useAuthStore } from '@/store/modules/auth';
 import { useSchoolStore } from '@/store/modules/school';
 import { useDemoAccess } from '@/hooks/business/demo-access';
-import { roleProfiles } from '@/mock/video-platform';
+import { demoAccounts, roleProfiles } from '@/mock/video-platform';
 
 const authStore = useAuthStore();
 const schoolStore = useSchoolStore();
 const { isPlatformOps, isSchoolAdmin, isStudent, isTeacher } = useDemoAccess();
 
 const permissionMatrix = [
-  ['自由输入指令', '教师', '学生'],
-  ['脚本强制审核', '教师', '-'],
-  ['审批学生视频', '教师', '-'],
-  ['上传校徽 / 校训 / 背景图', '学校管理员', '-'],
-  ['查看全校生成记录', '学校管理员', '-'],
-  ['维护全局审核阈值', '平台运营', '-']
+  ['自由输入指令', '教师 / 学生', '学生能提交但不能审稿'],
+  ['脚本强制审核', '教师', '教师确认前禁止进入批量生成'],
+  ['审批学生视频', '教师', '决定学生作品是否可见'],
+  ['上传校徽 / 校训 / 背景图', '学校管理员', '学校素材只在本校生效'],
+  ['查看全校生成记录', '学校管理员', '不允许跨校查看'],
+  ['维护全局审核阈值', '平台运营', '跨校统一规则与阈值管理']
 ];
 
 const currentRole = computed(() => {
@@ -70,6 +70,24 @@ const menuMatrix = computed(() => [
       </NGi>
     </NGrid>
 
+    <NCard title="演示账号与推荐讲解路径" :bordered="false" class="card-wrapper">
+      <div class="grid gap-12px md:grid-cols-2">
+        <div v-for="item in demoAccounts" :key="item.key" class="account-card">
+          <div class="flex items-center justify-between gap-10px">
+            <div>
+              <div class="text-15px text-[#111827] font-700">{{ item.label }}</div>
+              <div class="mt-4px text-12px text-[#64748b]">登录名：{{ item.loginName }}</div>
+            </div>
+            <NTag size="small" :bordered="false" type="success">{{ item.school }}</NTag>
+          </div>
+          <div class="mt-10px text-13px text-[#475569]">建议从 {{ item.focusRoute }} 开始讲。</div>
+          <div class="mt-10px flex flex-wrap gap-8px">
+            <span v-for="point in item.highlights" :key="point" class="capability-pill">{{ point }}</span>
+          </div>
+        </div>
+      </div>
+    </NCard>
+
     <NCard title="关键权限矩阵" :bordered="false" class="card-wrapper">
       <div class="overflow-x-auto">
         <table class="permission-table">
@@ -84,7 +102,7 @@ const menuMatrix = computed(() => [
             <tr v-for="item in permissionMatrix" :key="item[0]">
               <td>{{ item[0] }}</td>
               <td>{{ item[1] }}</td>
-              <td>{{ item[2] === '-' ? '按平台默认规则执行' : item[2] }}</td>
+              <td>{{ item[2] }}</td>
             </tr>
           </tbody>
         </table>
@@ -93,7 +111,7 @@ const menuMatrix = computed(() => [
 
     <NCard title="演示菜单可见性" :bordered="false" class="card-wrapper">
       <div class="grid gap-12px">
-        <div v-for="item in menuMatrix" :key="item.menu" class="capability-pill justify-between">
+        <div v-for="item in menuMatrix" :key="item.menu" class="menu-card">
           <div>
             <div class="text-14px text-[#111827] font-600">{{ item.menu }}</div>
             <div class="mt-4px text-12px text-[#64748b]">{{ item.desc }}</div>
@@ -141,6 +159,18 @@ const menuMatrix = computed(() => [
   font-size: 12px;
   font-weight: 600;
   border: 1px solid rgb(148 163 184 / 0.18);
+}
+
+.account-card,
+.menu-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  border: 1px solid rgb(148 163 184 / 0.16);
 }
 
 .permission-table {
