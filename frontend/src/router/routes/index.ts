@@ -23,6 +23,11 @@ const routeMetaPatches: Record<string, Record<string, any>> = {
     icon: 'mdi:tune-vertical-variant',
     order: 3
   },
+  'governance_review-workflow': {
+    roles: ['R_SCHOOL_ADMIN', 'R_PLATFORM_OPS'],
+    icon: 'mdi:source-branch',
+    order: 4
+  },
   school: { roles: ['R_SCHOOL_ADMIN'] },
   school_assets: { roles: ['R_SCHOOL_ADMIN'] },
   operations: { roles: ['R_SCHOOL_ADMIN', 'R_PLATFORM_OPS'] },

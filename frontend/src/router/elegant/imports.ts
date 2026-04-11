@@ -21,6 +21,7 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   "iframe-page": () => import("@/views/_builtin/iframe-page/[url].vue"),
   login: () => import("@/views/_builtin/login/index.vue"),
   governance_library: () => import("@/views/governance/library/index.vue"),
+  "governance_review-workflow": () => import("@/views/governance/review-workflow/index.vue"),
   governance_review: () => import("@/views/governance/review/index.vue"),
   governance_rules: () => import("@/views/governance/rules/index.vue"),
   home: () => import("@/views/home/index.vue"),

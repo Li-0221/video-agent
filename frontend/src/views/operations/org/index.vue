@@ -14,6 +14,7 @@ const permissionMatrix = [
   ['脚本强制审核', '教师', '教师确认前禁止进入批量生成'],
   ['审批学生视频', '教师', '决定学生作品是否可见'],
   ['上传校徽 / 校训 / 背景图', '学校管理员', '学校素材只在本校生效'],
+  ['审核工作流配置（二期）', '学校管理员 / 平台运营', '学校管理员配置本校链路，平台运营维护平台模板'],
   ['查看全校生成记录', '学校管理员', '不允许跨校查看'],
   ['维护全局审核阈值', '平台运营', '跨校统一规则与阈值管理']
 ];
@@ -35,6 +36,11 @@ const menuMatrix = computed(() => [
     menu: '审核规则管理',
     visible: isSchoolAdmin.value || isPlatformOps.value,
     desc: '学校管理员看校级规则，平台运营看全局规则。'
+  },
+  {
+    menu: '审核工作流配置（二期）',
+    visible: isSchoolAdmin.value || isPlatformOps.value,
+    desc: '学校管理员主用，平台运营可维护平台默认模板。'
   },
   { menu: '学校素材与标签', visible: isSchoolAdmin.value, desc: '仅学校管理员维护校徽、校训和校园背景。' }
 ]);

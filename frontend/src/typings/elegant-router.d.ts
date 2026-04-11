@@ -23,6 +23,7 @@ declare module "@elegant-router/types" {
     "governance": "/governance";
     "governance_library": "/governance/library";
     "governance_review": "/governance/review";
+    "governance_review-workflow": "/governance/review-workflow";
     "governance_rules": "/governance/rules";
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
@@ -104,6 +105,7 @@ declare module "@elegant-router/types" {
     | "iframe-page"
     | "login"
     | "governance_library"
+    | "governance_review-workflow"
     | "governance_review"
     | "governance_rules"
     | "home"

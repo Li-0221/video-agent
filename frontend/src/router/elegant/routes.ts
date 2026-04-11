@@ -73,6 +73,15 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       },
       {
+        name: 'governance_review-workflow',
+        path: '/governance/review-workflow',
+        component: 'view.governance_review-workflow',
+        meta: {
+          title: 'governance_review-workflow',
+          i18nKey: 'route.governance_review-workflow'
+        }
+      },
+      {
         name: 'governance_rules',
         path: '/governance/rules',
         component: 'view.governance_rules',

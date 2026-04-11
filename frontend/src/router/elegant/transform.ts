@@ -169,6 +169,7 @@ const routeMap: RouteMap = {
   "governance": "/governance",
   "governance_library": "/governance/library",
   "governance_review": "/governance/review",
+  "governance_review-workflow": "/governance/review-workflow",
   "governance_rules": "/governance/rules",
   "home": "/home",
   "iframe-page": "/iframe-page/:url",

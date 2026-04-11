@@ -237,6 +237,7 @@ const local: App.I18n.Schema = {
     governance_review: 'Safety Review',
     governance_library: 'Video Library',
     governance_rules: 'Review Rules',
+    'governance_review-workflow': 'Review Workflow Config (Phase 2)',
     school: 'School Setup',
     school_assets: 'Assets & Tags',
     operations: 'Operations',
